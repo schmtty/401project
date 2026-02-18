@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageHeader from '@/components/PageHeader';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { sampleConnections, generateId } from '@/utils/sampleData';
+import { useConnections } from '@/hooks/useConnections';
+import { generateId } from '@/utils/sampleData';
 import type { Connection } from '@/utils/sampleData';
 
 const avatars = ['👨‍🦱', '👩‍🦰', '👨', '👩', '🧔', '👱‍♀️', '👱', '🧑‍🦱'];
 
 const NewConnectionPage = () => {
   const navigate = useNavigate();
-  const [connections, setConnections] = useLocalStorage<Connection[]>('connections', sampleConnections);
+  const [connections, setConnections] = useConnections();
   const [form, setForm] = useState({
     name: '', age: '', phone: '', location: '', notes: '', avatar: avatars[0],
   });
@@ -24,7 +24,9 @@ const NewConnectionPage = () => {
       phone: form.phone,
       location: form.location,
       notes: form.notes,
-      avatar: form.avatar,
+      gender: 'male',
+      relationship: 'connection',
+      liked: false,
       createdAt: new Date().toISOString().split('T')[0],
       milestones: { dates: 0, heldHands: false, kissed: false, metParents: false, contactStreak: 0 },
     };

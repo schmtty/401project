@@ -1,17 +1,36 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Phone, MapPin, Flame, Heart, HandMetal, Users, Calendar, Trash2 } from 'lucide-react';
+import { Phone, MapPin, Flame, Heart, HandMetal, Users, Calendar, Trash2, MoreVertical, Pencil } from 'lucide-react';
+import ConnectionAvatar from '@/components/ConnectionAvatar';
 import PageHeader from '@/components/PageHeader';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { sampleConnections, sampleEvents } from '@/utils/sampleData';
-import type { Connection, CalendarEvent } from '@/utils/sampleData';
+import { useConnections } from '@/hooks/useConnections';
+import { useAddConnection } from '@/contexts/AddConnectionContext';
+import { useEventModal } from '@/contexts/EventModalContext';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const ConnectionDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [connections, setConnections] = useLocalStorage<Connection[]>('connections', sampleConnections);
-  const [events] = useLocalStorage<CalendarEvent[]>('events', sampleEvents);
+  const { openForEdit } = useAddConnection();
+  const { events, openEvent } = useEventModal();
+  const [connections, setConnections] = useConnections();
   const [editingNotes, setEditingNotes] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const connection = connections.find(c => c.id === id);
   if (!connection) return <div className="mobile-container page-padding pt-20 text-center text-muted-foreground">Connection not found</div>;
@@ -29,10 +48,9 @@ const ConnectionDetailPage = () => {
   };
 
   const handleDelete = () => {
-    if (window.confirm(`Delete ${connection.name}?`)) {
-      setConnections(prev => prev.filter(c => c.id !== id));
-      navigate('/connections');
-    }
+    setConnections(prev => prev.filter(c => c.id !== id));
+    setShowDeleteConfirm(false);
+    navigate('/connections');
   };
 
   const milestoneItems = [
@@ -49,17 +67,46 @@ const ConnectionDetailPage = () => {
         title=""
         showBack
         rightAction={
-          <button onClick={handleDelete} className="tap-target flex items-center justify-center text-destructive active-scale">
-            <Trash2 size={20} />
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="tap-target flex items-center justify-center text-muted-foreground hover:text-foreground active-scale">
+                <MoreVertical size={20} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => openForEdit(connection)}>
+                <Pencil size={14} className="mr-2" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setShowDeleteConfirm(true)} className="text-destructive focus:text-destructive">
+                <Trash2 size={14} className="mr-2" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         }
       />
 
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete connection?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {connection.name}? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Profile header */}
       <div className="flex flex-col items-center py-4 animate-fade-in">
-        <div className="w-24 h-24 rounded-3xl bg-secondary flex items-center justify-center text-5xl mb-3 shadow-sm">
-          {connection.avatar}
-        </div>
+        <ConnectionAvatar gender={connection.gender ?? 'male'} size={96} className="rounded-3xl mb-3 shadow-sm" />
         <h2 className="text-xl font-bold text-foreground">{connection.name}</h2>
         <p className="text-sm text-muted-foreground">Age {connection.age}</p>
         <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
@@ -124,13 +171,17 @@ const ConnectionDetailPage = () => {
           {connectionEvents.length > 0 ? (
             <div className="space-y-3">
               {connectionEvents.map(event => (
-                <div key={event.id} className="flex gap-3 items-start">
+                <button
+                  key={event.id}
+                  onClick={() => openEvent(event.id, 'view')}
+                  className="w-full flex gap-3 items-start text-left hover:bg-secondary/50 rounded-xl p-2 -mx-2 transition-colors active-scale"
+                >
                   <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground">{event.title}</p>
-                    <p className="text-xs text-muted-foreground">{event.date} · {event.time} · {event.location}</p>
+                    <p className="text-xs text-muted-foreground">{event.date} · {event.time}{event.location ? ` · ${event.location}` : ''}</p>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           ) : (

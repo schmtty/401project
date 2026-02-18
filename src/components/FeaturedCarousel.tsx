@@ -1,5 +1,6 @@
 import type { Connection } from '@/utils/sampleData';
 import { useNavigate } from 'react-router-dom';
+import ConnectionAvatar from '@/components/ConnectionAvatar';
 
 interface FeaturedCarouselProps {
   connections: Connection[];
@@ -17,9 +18,7 @@ const FeaturedCarousel = ({ connections }: FeaturedCarouselProps) => {
           onClick={() => navigate(`/connections/${c.id}`)}
           className="shrink-0 w-20 flex flex-col items-center gap-1 active-scale"
         >
-          <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center text-3xl shadow-sm">
-            {c.avatar}
-          </div>
+          <ConnectionAvatar gender={c.gender ?? 'male'} size={64} className="rounded-2xl shadow-sm overflow-hidden" />
           <span className="text-xs font-medium text-card-foreground truncate w-full text-center">{c.name.split(' ')[0]}</span>
         </button>
       ))}

@@ -11,7 +11,7 @@ const PageHeader = ({ title, showBack = false, rightAction }: PageHeaderProps) =
   const navigate = useNavigate();
 
   return (
-    <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 bg-background/90 backdrop-blur-xl border-b border-border/50">
       <div className="flex items-center justify-between px-5 h-14">
         <div className="flex items-center gap-3">
           {showBack && (

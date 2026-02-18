@@ -50,6 +50,18 @@ npm run dev
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
 
+## Where is user data stored?
+
+Since there is no backend, all user data is stored in the browser's **LocalStorage**:
+
+- **`connections`** – Contacts/connections (name, age, phone, notes, milestones, etc.)
+- **`events`** – Calendar events (title, date, time, location, notes, color, connection link)
+- **`goals`** – Goals and progress tracking
+- **`area-book-theme`** – Selected theme (light, dark, pastel, comfort, sunset)
+- **`area-book-geocode-cache`** – Cached map coordinates for locations (for faster map loading)
+
+Data persists across sessions on the same device/browser. Clearing browser data or using a different browser will reset it.
+
 ## What technologies are used for this project?
 
 This project is built with:

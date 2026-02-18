@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { sampleConnections, generateId } from '@/utils/sampleData';
+import { useConnections } from '@/hooks/useConnections';
+import { generateId } from '@/utils/sampleData';
 import type { Connection, ChatMessage } from '@/utils/sampleData';
 
 const OBJECTIVES = [
@@ -17,6 +17,12 @@ const OBJECTIVES = [
 const generateResponse = (connection: Connection | undefined, objective: string, userMessage: string): string => {
   const name = connection?.name || 'them';
   const notes = connection?.notes || '';
+  const msg = userMessage.toLowerCase();
+
+  // Context-aware feedback based on user's draft
+  const tooShort = msg.length < 10 && msg.length > 0;
+  const hasQuestion = msg.includes('?');
+  const hasEmoji = /[\u{1F300}-\u{1F9FF}]/u.test(userMessage);
 
   const templates: Record<string, string[]> = {
     'Ask on a date': [
@@ -50,11 +56,24 @@ const generateResponse = (connection: Connection | undefined, objective: string,
   };
 
   const options = templates[objective] || templates['Keep the conversation going'];
-  return options[Math.floor(Math.random() * options.length)];
+  let response = options[Math.floor(Math.random() * options.length)];
+
+  // Add contextual tips (only when user wrote something meaningful)
+  if (msg.length > 0) {
+    if (tooShort) {
+      response = `Your message is short — here's a more impactful version: ${response}`;
+    } else if (hasQuestion && (objective === 'Ask on a date' || objective === 'Ask on a second date')) {
+      response = `Asking a question is great! Here's a polished version: ${response}`;
+    } else if (hasEmoji) {
+      response = `Love the emoji energy! 😊 ${response}`;
+    }
+  }
+
+  return response;
 };
 
 const RizzBotPage = () => {
-  const [connections] = useLocalStorage<Connection[]>('connections', sampleConnections);
+  const [connections] = useConnections();
   const [selectedConnection, setSelectedConnection] = useState('');
   const [selectedObjective, setSelectedObjective] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -98,11 +117,13 @@ const RizzBotPage = () => {
 
   return (
     <div className="mobile-container flex flex-col" style={{ height: '100dvh' }}>
-      <PageHeader title="RizzBot 🤖" />
+      <PageHeader title="RizzBot 🤖" showBack />
 
       {messages.length === 0 ? (
         <div className="flex-1 page-padding space-y-4 animate-fade-in">
-          <p className="text-sm text-muted-foreground">Select a connection and what you want to accomplish. I'll help you craft the perfect message!</p>
+          <div className="card-ios p-4 gradient-card border-primary/10">
+            <p className="text-sm text-muted-foreground">Select a connection and what you want to accomplish. I'll help you craft the perfect message!</p>
+          </div>
 
           <div>
             <label className="text-sm font-medium text-foreground mb-1 block">Who are you texting?</label>
@@ -138,7 +159,7 @@ const RizzBotPage = () => {
           <button
             onClick={startSession}
             disabled={!selectedConnection || !selectedObjective}
-            className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold active-scale disabled:opacity-40"
+            className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold active-scale disabled:opacity-40 shadow-lg shadow-primary/25"
           >
             Start Session
           </button>
