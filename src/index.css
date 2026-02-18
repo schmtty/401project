@@ -1,38 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
-
 @layer base {
-  :root {
-    --background: 0 0% 96%;
-    --foreground: 0 0% 10%;
+  :root,
+  .theme-light {
+    --background: 0 0% 98%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 220 80% 55%;
+    --primary: 262 83% 58%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 93%;
-    --secondary-foreground: 0 0% 20%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 222 47% 20%;
 
-    --muted: 0 0% 94%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
 
-    --accent: 220 80% 55%;
+    --accent: 262 83% 58%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 220 80% 55%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 262 83% 58%;
 
     --radius: 1rem;
 
@@ -43,9 +44,8 @@
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 262 83% 58%;
 
-    /* Custom tokens */
     --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
@@ -56,26 +56,116 @@
     --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
 
-  .dark {
-    --background: 0 0% 7%;
-    --foreground: 0 0% 95%;
-    --card: 0 0% 12%;
-    --card-foreground: 0 0% 95%;
-    --popover: 0 0% 12%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 220 80% 60%;
+  .theme-dark {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 14%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 14%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 263 70% 65%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 85%;
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 60%;
-    --accent: 220 80% 60%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 90%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 263 70% 65%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 62% 45%;
     --destructive-foreground: 0 0% 95%;
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
-    --ring: 220 80% 60%;
+    --border: 217 33% 22%;
+    --input: 217 33% 22%;
+    --ring: 263 70% 65%;
+  }
+
+  .theme-pastel {
+    --background: 280 60% 98%;
+    --foreground: 280 30% 25%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 280 30% 25%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 280 30% 25%;
+
+    --primary: 320 70% 65%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 280 40% 95%;
+    --secondary-foreground: 280 30% 30%;
+
+    --muted: 280 40% 94%;
+    --muted-foreground: 280 20% 50%;
+
+    --accent: 200 70% 65%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 70% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 280 30% 90%;
+    --input: 280 30% 90%;
+    --ring: 320 70% 65%;
+  }
+
+  .theme-comfort {
+    --background: 30 25% 96%;
+    --foreground: 25 25% 15%;
+
+    --card: 40 25% 99%;
+    --card-foreground: 25 25% 15%;
+
+    --popover: 40 25% 99%;
+    --popover-foreground: 25 25% 15%;
+
+    --primary: 25 95% 53%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 35 25% 92%;
+    --secondary-foreground: 25 25% 25%;
+
+    --muted: 35 25% 91%;
+    --muted-foreground: 25 15% 45%;
+
+    --accent: 160 60% 45%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 35 20% 88%;
+    --input: 35 20% 88%;
+    --ring: 25 95% 53%;
+  }
+
+  .theme-sunset {
+    --background: 340 50% 97%;
+    --foreground: 340 30% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 340 30% 20%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 340 30% 20%;
+
+    --primary: 350 75% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 340 45% 94%;
+    --secondary-foreground: 340 30% 25%;
+
+    --muted: 340 45% 93%;
+    --muted-foreground: 340 20% 45%;
+
+    --accent: 30 90% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 340 35% 88%;
+    --input: 340 35% 88%;
+    --ring: 350 75% 55%;
   }
 }
 
@@ -86,13 +176,13 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'DM Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'DM Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     @apply font-semibold tracking-tight;
   }
 }
@@ -129,6 +219,14 @@
   .active-scale {
     @apply active:scale-[0.97] transition-transform duration-150;
   }
+
+  .gradient-bg {
+    background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--primary) / 0.05) 100%);
+  }
+
+  .gradient-card {
+    background: linear-gradient(145deg, hsl(var(--card)) 0%, hsl(var(--primary) / 0.03) 100%);
+  }
 }
 
 /* Scrollbar hidden */
@@ -138,4 +236,21 @@
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Leaflet popup overrides for dark mode */
+.theme-dark .leaflet-popup-content-wrapper,
+.theme-dark .leaflet-popup-tip {
+  background: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+}
+
+.theme-dark .leaflet-popup-content {
+  color: hsl(var(--card-foreground));
+}
+
+/* Custom map markers - no default pin background */
+.leaflet-marker-icon.custom-marker {
+  background: none !important;
+  border: none !important;
 }

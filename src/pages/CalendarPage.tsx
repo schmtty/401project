@@ -1,20 +1,36 @@
-import { useState, useMemo } from 'react';
-import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useMemo, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Plus, ChevronLeft, ChevronRight, MoreVertical, Info, Pencil, Trash2 } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { sampleEvents, sampleConnections, generateId } from '@/utils/sampleData';
-import type { CalendarEvent, Connection } from '@/utils/sampleData';
+import { useEventModal } from '@/contexts/EventModalContext';
+import { useConnections } from '@/hooks/useConnections';
+import type { CalendarEvent } from '@/utils/sampleData';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const EVENT_TYPES: CalendarEvent['type'][] = ['date', 'hangout', 'call', 'text', 'other'];
 
 const CalendarPage = () => {
-  const [events, setEvents] = useLocalStorage<CalendarEvent[]>('events', sampleEvents);
-  const [connections] = useLocalStorage<Connection[]>('connections', sampleConnections);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { events, setEvents, openEvent, openEventForDate } = useEventModal();
+  const [connections] = useConnections();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  const [showAdd, setShowAdd] = useState(false);
-  const [form, setForm] = useState({ title: '', time: '12:00', location: '', notes: '', type: 'date' as CalendarEvent['type'], connectionId: '' });
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -30,39 +46,46 @@ const CalendarPage = () => {
   }, [firstDay, daysInMonth]);
 
   const dateStr = (day: number) => `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-  const eventsForDay = (day: number) => events.filter(e => e.date === dateStr(day));
-  const todayEvents = events.filter(e => e.date === selectedDate).sort((a, b) => a.time.localeCompare(b.time));
+  const eventsForDay = (day: number) => events.filter((e) => e.date === dateStr(day));
+  const todayEvents = events.filter((e) => e.date === selectedDate).sort((a, b) => a.time.localeCompare(b.time));
   const today = new Date().toISOString().split('T')[0];
 
   const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
   const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
 
-  const handleAddEvent = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.title.trim()) return;
-    const newEvent: CalendarEvent = {
-      id: generateId(),
-      title: form.title,
-      date: selectedDate,
-      time: form.time,
-      location: form.location,
-      notes: form.notes,
-      type: form.type,
-      connectionId: form.connectionId || undefined,
-    };
-    setEvents(prev => [...prev, newEvent]);
-    setForm({ title: '', time: '12:00', location: '', notes: '', type: 'date', connectionId: '' });
-    setShowAdd(false);
-  };
+  // Open event from URL (e.g. /calendar?event=123 or /calendar?date=2026-02-11)
+  const handledRef = useRef(false);
+  useEffect(() => {
+    if (handledRef.current) return;
+    const eventId = searchParams.get('event');
+    const date = searchParams.get('date');
+    const mode = searchParams.get('mode') as 'view' | 'edit' | null;
+    if (eventId) {
+      handledRef.current = true;
+      setSearchParams({});
+      openEvent(eventId, mode || 'view');
+    } else if (date) {
+      handledRef.current = true;
+      setSelectedDate(date);
+      setSearchParams({});
+      openEventForDate(date);
+    }
+  }, [searchParams]);
 
   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+  const handleDeleteEvent = (id: string) => {
+    setEvents((prev) => prev.filter((e) => e.id !== id));
+    setDeleteConfirmId(null);
+  };
 
   return (
     <div className="mobile-container pb-24">
       <PageHeader
         title="Calendar"
+        showBack
         rightAction={
-          <button onClick={() => setShowAdd(!showAdd)} className="tap-target flex items-center justify-center text-primary active-scale">
+          <button onClick={() => openEventForDate(selectedDate)} className="tap-target flex items-center justify-center text-primary active-scale">
             <Plus size={24} />
           </button>
         }
@@ -79,7 +102,7 @@ const CalendarPage = () => {
       <div className="px-5 mb-4">
         <div className="card-ios p-3">
           <div className="grid grid-cols-7 gap-1 mb-2">
-            {DAYS.map(d => (
+            {DAYS.map((d) => (
               <div key={d} className="text-center text-xs font-medium text-muted-foreground py-1">{d}</div>
             ))}
           </div>
@@ -95,16 +118,20 @@ const CalendarPage = () => {
                   key={i}
                   onClick={() => setSelectedDate(ds)}
                   className={`relative aspect-square rounded-xl flex items-center justify-center text-sm transition-ios ${
-                    isSelected
-                      ? 'bg-primary text-primary-foreground font-semibold'
-                      : isToday
-                      ? 'bg-primary/10 text-primary font-semibold'
-                      : 'text-foreground hover:bg-secondary'
+                    isSelected ? 'bg-primary text-primary-foreground font-semibold' : isToday ? 'bg-primary/10 text-primary font-semibold' : 'text-foreground hover:bg-secondary'
                   }`}
                 >
                   {day}
-                  {hasEvents && !isSelected && (
-                    <div className="absolute bottom-1 w-1 h-1 rounded-full bg-primary" />
+                  {hasEvents && (
+                    <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5 justify-center">
+                      {eventsForDay(day).slice(0, 3).map((ev, idx) => (
+                        <div
+                          key={idx}
+                          className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white' : ''}`}
+                          style={!isSelected ? { backgroundColor: ev.color || 'hsl(var(--primary))' } : undefined}
+                        />
+                      ))}
+                    </div>
                   )}
                 </button>
               );
@@ -119,31 +146,51 @@ const CalendarPage = () => {
           {selectedDate === today ? 'Planned for today' : `Events on ${selectedDate}`}
         </h3>
         <div className="space-y-2">
-          {todayEvents.map(event => {
-            const conn = connections.find(c => c.id === event.connectionId);
+          {todayEvents.map((event) => {
+            const conn = connections.find((c) => c.id === event.connectionId);
+            const eventColor = event.color || 'hsl(var(--primary))';
             return (
-              <div key={event.id} className="card-ios p-4 flex items-start gap-3 animate-slide-up">
+              <div
+                key={event.id}
+                className="card-ios p-4 flex items-start gap-3 animate-slide-up border-l-4 cursor-pointer hover:shadow-md transition-shadow"
+                style={{ borderLeftColor: eventColor }}
+                onClick={() => openEvent(event.id, 'view')}
+              >
                 <div className="text-xs font-semibold text-muted-foreground mt-0.5 w-16 shrink-0">
                   {event.time.replace(/^(\d{2}):(\d{2})$/, (_, h, m) => {
                     const hr = parseInt(h);
                     return `${hr > 12 ? hr - 12 : hr}:${m}${hr >= 12 ? 'PM' : 'AM'}`;
                   })}
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <p className="font-medium text-foreground">{event.title}</p>
                   {event.location && <p className="text-xs text-muted-foreground">{event.location}</p>}
                   {conn && <p className="text-xs text-primary mt-0.5">with {conn.name}</p>}
                 </div>
-                <button
-                  onClick={() => {
-                    if (window.confirm('Delete event?')) {
-                      setEvents(prev => prev.filter(e => e.id !== event.id));
-                    }
-                  }}
-                  className="text-xs text-destructive font-medium"
-                >
-                  ×
-                </button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      onClick={(e) => e.stopPropagation()}
+                      className="tap-target flex items-center justify-center text-muted-foreground hover:text-foreground shrink-0"
+                    >
+                      <MoreVertical size={18} />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); openEvent(event.id, 'view'); }}>
+                      <Info size={14} className="mr-2" />
+                      View info
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); openEvent(event.id, 'edit'); }}>
+                      <Pencil size={14} className="mr-2" />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(event.id); }} className="text-destructive focus:text-destructive">
+                      <Trash2 size={14} className="mr-2" />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             );
           })}
@@ -153,57 +200,20 @@ const CalendarPage = () => {
         </div>
       </div>
 
-      {/* Add Event Modal */}
-      {showAdd && (
-        <div className="fixed inset-0 z-50 bg-foreground/30 backdrop-blur-sm flex items-end">
-          <div className="w-full max-w-md mx-auto bg-card rounded-t-3xl p-5 pb-8 animate-slide-up">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-foreground">New Event</h3>
-              <button onClick={() => setShowAdd(false)} className="text-muted-foreground text-lg">×</button>
-            </div>
-            <form onSubmit={handleAddEvent} className="space-y-3">
-              <input
-                placeholder="Event title"
-                value={form.title}
-                onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-                className="w-full px-4 py-3 rounded-xl bg-secondary text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary"
-              />
-              <div className="flex gap-2">
-                <input
-                  type="time"
-                  value={form.time}
-                  onChange={e => setForm(f => ({ ...f, time: e.target.value }))}
-                  className="flex-1 px-4 py-3 rounded-xl bg-secondary text-foreground outline-none focus:ring-2 focus:ring-primary"
-                />
-                <select
-                  value={form.type}
-                  onChange={e => setForm(f => ({ ...f, type: e.target.value as CalendarEvent['type'] }))}
-                  className="flex-1 px-4 py-3 rounded-xl bg-secondary text-foreground outline-none focus:ring-2 focus:ring-primary"
-                >
-                  {EVENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
-              </div>
-              <input
-                placeholder="Location"
-                value={form.location}
-                onChange={e => setForm(f => ({ ...f, location: e.target.value }))}
-                className="w-full px-4 py-3 rounded-xl bg-secondary text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary"
-              />
-              <select
-                value={form.connectionId}
-                onChange={e => setForm(f => ({ ...f, connectionId: e.target.value }))}
-                className="w-full px-4 py-3 rounded-xl bg-secondary text-foreground outline-none focus:ring-2 focus:ring-primary"
-              >
-                <option value="">No connection</option>
-                {connections.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
-              <button type="submit" className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold active-scale">
-                Add Event
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
+      <AlertDialog open={!!deleteConfirmId} onOpenChange={() => setDeleteConfirmId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete event?</AlertDialogTitle>
+            <AlertDialogDescription>Are you sure? This cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => deleteConfirmId && handleDeleteEvent(deleteConfirmId)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
