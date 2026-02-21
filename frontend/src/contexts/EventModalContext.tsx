@@ -1,8 +1,8 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import MapLocationPicker from '@/components/MapLocationPicker';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useEvents } from '@/hooks/useEvents';
 import { useConnections } from '@/hooks/useConnections';
-import { sampleEvents, generateId, EVENT_COLORS } from '@/utils/sampleData';
+import { generateId, EVENT_COLORS } from '@/utils/sampleData';
 import type { CalendarEvent, Connection } from '@/utils/sampleData';
 
 const EVENT_TYPES: CalendarEvent['type'][] = ['date', 'hangout', 'call', 'text', 'other'];
@@ -33,7 +33,7 @@ interface EventModalContextType {
 const EventModalContext = createContext<EventModalContextType | undefined>(undefined);
 
 export function EventModalProvider({ children }: { children: ReactNode }) {
-  const [events, setEvents] = useLocalStorage<CalendarEvent[]>('events', sampleEvents);
+  const [events, setEvents] = useEvents();
   const [connections] = useConnections();
   const [focusedEventId, setFocusedEventId] = useState<string | null>(null);
   const [focusedDate, setFocusedDate] = useState<string | null>(null);
