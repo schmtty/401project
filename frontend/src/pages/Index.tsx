@@ -1,15 +1,17 @@
 import { useNavigate } from 'react-router-dom';
 import { Users, MapPin, Calendar, Target, MessageCircle, Home } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const menuItems = [
-    { path: '/connections', label: 'Connections', icon: Users },
-    { path: '/map', label: 'Map', icon: MapPin },
-    { path: '/calendar', label: 'Calendar', icon: Calendar },
-    { path: '/goals', label: 'Goals', icon: Target },
-    { path: '/rizzbot', label: 'RizzBot', icon: MessageCircle },
+    { path: '/connections', labelKey: 'home.connections', icon: Users },
+    { path: '/map', labelKey: 'home.map', icon: MapPin },
+    { path: '/calendar', labelKey: 'home.calendar', icon: Calendar },
+    { path: '/goals', labelKey: 'home.goals', icon: Target },
+    { path: '/rizzbot', labelKey: 'home.rizzbot', icon: MessageCircle },
   ];
 
   return (
@@ -19,12 +21,12 @@ const HomePage = () => {
           <Home size={40} className="text-primary" />
         </div>
         <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent tracking-tight">
-          Area Book 2.0
+          {t('app.title')}
         </h1>
       </div>
 
       <div className="w-full space-y-3 animate-slide-up">
-        {menuItems.map(({ path, label, icon: Icon }) => (
+        {menuItems.map(({ path, labelKey, icon: Icon }) => (
           <button
             key={path}
             onClick={() => navigate(path)}
@@ -33,7 +35,7 @@ const HomePage = () => {
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
               <Icon size={22} className="text-primary" />
             </div>
-            <span className="text-lg font-medium text-foreground">{label}</span>
+            <span className="text-lg font-medium text-foreground">{t(labelKey)}</span>
           </button>
         ))}
       </div>

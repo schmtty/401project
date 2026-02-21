@@ -1,11 +1,13 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { UserPlus, Home, Settings } from 'lucide-react';
 import { useAddConnection } from '@/contexts/AddConnectionContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const BottomNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { open: openAddConnection } = useAddConnection();
+  const { t } = useLanguage();
 
   // Show on all main pages (hide only on connection detail to avoid crowding)
   const isDetailPage = /^\/connections\/[^/]+$/.test(location.pathname);
@@ -24,7 +26,7 @@ const BottomNav = () => {
           className="flex flex-col items-center gap-0.5 tap-target px-4 py-1 transition-ios text-muted-foreground hover:text-foreground active-scale"
         >
           <UserPlus size={24} strokeWidth={1.8} />
-          <span className="text-[10px] font-medium">Add</span>
+          <span className="text-[10px] font-medium">{t('nav.add')}</span>
         </button>
 
         <button
@@ -34,7 +36,7 @@ const BottomNav = () => {
           }`}
         >
           <Home size={24} strokeWidth={isHome ? 2.5 : 1.8} />
-          <span className="text-[10px] font-medium">Home</span>
+          <span className="text-[10px] font-medium">{t('nav.home')}</span>
         </button>
 
         <button
@@ -44,7 +46,7 @@ const BottomNav = () => {
           }`}
         >
           <Settings size={24} strokeWidth={location.pathname === '/settings' ? 2.5 : 1.8} />
-          <span className="text-[10px] font-medium">Settings</span>
+          <span className="text-[10px] font-medium">{t('nav.settings')}</span>
         </button>
       </div>
     </nav>

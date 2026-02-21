@@ -8,8 +8,9 @@ export default defineConfig({
     host: "::",
     port: 8080,
     open: true,
-    hmr: {
-      overlay: true,
+    hmr: { overlay: true },
+    proxy: {
+      "/api": { target: "http://localhost:3001", changeOrigin: true },
     },
   },
   plugins: [react()],
