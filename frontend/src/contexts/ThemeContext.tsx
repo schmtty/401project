@@ -1,8 +1,7 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, type ReactNode } from 'react';
+import { useUser } from '@/contexts/UserContext';
 
 export type ThemeMode = 'light' | 'dark' | 'pastel' | 'comfort' | 'sunset';
-
-const THEME_STORAGE_KEY = 'area-book-theme';
 
 interface ThemeContextType {
   theme: ThemeMode;
@@ -12,19 +11,20 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<ThemeMode>(() => {
-    const stored = localStorage.getItem(THEME_STORAGE_KEY);
-    return (stored as ThemeMode) || 'light';
-  });
+  const { currentUser, settings, updateSettings } = useUser();
+  const theme = (currentUser && settings?.theme ? settings.theme : 'light') as ThemeMode;
 
   useEffect(() => {
-    localStorage.setItem(THEME_STORAGE_KEY, theme);
     document.documentElement.setAttribute('data-theme', theme);
     document.documentElement.classList.remove('theme-light', 'theme-dark', 'theme-pastel', 'theme-comfort', 'theme-sunset');
     document.documentElement.classList.add(`theme-${theme}`);
   }, [theme]);
 
-  const setTheme = (t: ThemeMode) => setThemeState(t);
+  const setTheme = (t: ThemeMode) => {
+    if (currentUser) {
+      updateSettings({ theme: t });
+    }
+  };
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>
