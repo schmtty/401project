@@ -8,9 +8,15 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const { Pool } = pg;
+const databaseUrl = process.env.DATABASE_URL;
+const useSsl =
+  process.env.PGSSL === 'true' ||
+  process.env.PGSSLMODE === 'require' ||
+  (process.env.NODE_ENV === 'production' && databaseUrl && !databaseUrl.includes('localhost'));
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: databaseUrl,
+  ssl: useSsl ? { rejectUnauthorized: false } : undefined,
 });
 
 // Log connection errors
