@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Plus, Trash2 } from 'lucide-react';
 import { useUser, type User } from '@/contexts/UserContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -210,6 +210,13 @@ const UsersPage = () => {
           </button>
         )}
       </div>
+
+      <p className="text-center text-sm text-muted-foreground mt-4">
+        Already have an account?{' '}
+        <Link to="/login" className="text-primary hover:underline font-medium">
+          Sign in
+        </Link>
+      </p>
 
       <AlertDialog open={!!removeConfirm} onOpenChange={() => setRemoveConfirm(null)}>
         <AlertDialogContent>

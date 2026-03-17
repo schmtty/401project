@@ -57,7 +57,19 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    refetchUsers().finally(() => setLoading(false));
+    refetchUsers().then(() => {
+      // Validate stored user still exists in DB
+      if (currentUser) {
+        setUsers((prev) => {
+          const stillExists = prev.some((u) => u.id === currentUser.id);
+          if (!stillExists) {
+            setCurrentUser(null);
+            localStorage.removeItem(CURRENT_USER_KEY);
+          }
+          return prev;
+        });
+      }
+    }).finally(() => setLoading(false));
   }, [refetchUsers]);
 
   useEffect(() => {
