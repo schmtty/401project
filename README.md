@@ -236,6 +236,25 @@ The **Add Connection** button is fully wired to the backend. Follow these steps 
 
 ---
 
+---
+
+## EARS Requirements
+
+### Complete
+
+1. **Ubiquitous:** The system shall synchronize all goals, calendar events, and dating milestones across the app.
+2. **Event-Driven:** When a user applies a filter, the system shall organize the calendar events around that filter. *(Implemented on Map page: filter events by connection.)*
+3. **State-Driven:** While the user is creating a calendar event, the calendar portion shall guide the user through event creation. *(Event modal provides a structured form: title, date, time, type, location, notes, connection, color.)*
+
+### Not Complete
+
+1. **Ubiquitous:** The system shall display a Key Indicator (KI) Dashboard that summarizes progress toward both personal and relationship goals.
+2. **Event-Driven:** When a user creates a new contact in the dating section, the system shall prompt the user to assign a "Next Step" task (to push the person forward in dating).
+3. **Event-Driven:** When a user applies a filter, the system shall organize the goals around that filter. *(Map filters events by connection; Goals page has no filter.)*
+4. **State-Driven:** While the user is in the finding portion of the app, the system shall display other users to create matches. *(No discovery/matching feature exists.)*
+
+---
+
 ## Features
 
 - **Multi-user profiles** (max 5): Netflix-style profile selection with optional PIN
