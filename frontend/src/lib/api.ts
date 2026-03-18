@@ -49,6 +49,10 @@ export const api = {
     update: (userId: string, id: string, body: object) => request(`/api/events/${id}`, { method: 'PUT', body: JSON.stringify(body), userId }),
     delete: (userId: string, id: string) => request(`/api/events/${id}`, { method: 'DELETE', userId }),
   },
+  rizzbot: {
+    generate: (userId: string, body: { connection: object; objective: string; userMessage: string; context: object }) =>
+      request<{ text: string }>(`/api/rizzbot`, { method: 'POST', body: JSON.stringify(body), userId }),
+  },
   goals: {
     getAll: (userId: string) => request(`/api/goals`, { userId }),
     create: (userId: string, body: object) => request(`/api/goals`, { method: 'POST', body: JSON.stringify(body), userId }),
