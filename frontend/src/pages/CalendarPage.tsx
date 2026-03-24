@@ -21,10 +21,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 const CalendarPage = () => {
+  useDocumentTitle('Calendar');
   const [searchParams, setSearchParams] = useSearchParams();
   const { events, setEvents, openEvent, openEventForDate } = useEventModal();
   const [connections] = useConnections();

@@ -6,6 +6,7 @@ import { useTheme, type ThemeMode } from '@/contexts/ThemeContext';
 import { useUser } from '@/contexts/UserContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AVATAR_OPTIONS } from '@/constants/avatars';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 const themeOptions: { id: ThemeMode; labelKey: string; icon: typeof Sun; descKey: string }[] = [
   { id: 'light', labelKey: 'settings.light', icon: Sun, descKey: 'settings.lightDesc' },
@@ -22,6 +23,7 @@ const languageOptions: { id: 'en' | 'es' | 'zh'; labelKey: string }[] = [
 ];
 
 const SettingsPage = () => {
+  useDocumentTitle('Settings');
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const { currentUser, settings, updateUser, updateSettings, signOut } = useUser();
