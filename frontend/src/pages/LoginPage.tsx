@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 const LoginPage = () => {
+  useDocumentTitle('Sign In');
   const navigate = useNavigate();
   const { users, loading, selectUser } = useUser();
   const { t } = useLanguage();

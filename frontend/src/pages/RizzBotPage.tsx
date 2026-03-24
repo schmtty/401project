@@ -9,6 +9,7 @@ import { generateId } from '@/utils/sampleData';
 import type { Connection, ChatMessage, CalendarEvent } from '@/utils/sampleData';
 import { deriveMilestonesFromEvents } from '@/utils/deriveMilestones';
 import { localDateStr } from '@/utils/eventTime';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 const OBJECTIVES = [
   'Ask on a date',
@@ -240,6 +241,7 @@ const generateResponse = (
 };
 
 const RizzBotPage = () => {
+  useDocumentTitle('RizzBot');
   const { currentUser } = useUser();
   const [connections] = useConnections();
   const { events } = useEventModal();

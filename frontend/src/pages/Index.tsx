@@ -11,8 +11,10 @@ import {
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useEventModal } from "@/contexts/EventModalContext";
 import { eventNeedsReport } from "@/utils/eventTime";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 const HomePage = () => {
+  useDocumentTitle('Home');
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { events } = useEventModal();
