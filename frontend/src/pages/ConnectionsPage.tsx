@@ -6,9 +6,11 @@ import { useConnections } from '@/hooks/useConnections';
 import { useAddConnection } from '@/contexts/AddConnectionContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useEventModal } from '@/contexts/EventModalContext';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { deriveMilestonesFromEvents } from '@/utils/deriveMilestones';
 
 const ConnectionsPage = () => {
+  useDocumentTitle('Connections');
   const { open: openAddConnection, openForEdit } = useAddConnection();
   const { t } = useLanguage();
   const { events } = useEventModal();

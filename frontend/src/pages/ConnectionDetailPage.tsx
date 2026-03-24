@@ -5,6 +5,7 @@ import ConnectionAvatar from '@/components/ConnectionAvatar';
 import PageHeader from '@/components/PageHeader';
 import { useConnections } from '@/hooks/useConnections';
 import { useAddConnection } from '@/contexts/AddConnectionContext';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useEventModal } from '@/contexts/EventModalContext';
 import { deriveMilestonesFromEvents } from '@/utils/deriveMilestones';
 import {
@@ -25,6 +26,7 @@ import {
 } from '@/components/ui/alert-dialog';
 
 const ConnectionDetailPage = () => {
+  useDocumentTitle('Connection Details');
   const { id } = useParams();
   const navigate = useNavigate();
   const { openForEdit } = useAddConnection();

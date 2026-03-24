@@ -22,6 +22,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 function sortKey(e: CalendarEvent): string {
@@ -29,6 +31,7 @@ function sortKey(e: CalendarEvent): string {
 }
 
 const CalendarPage = () => {
+  useDocumentTitle('Calendar');
   const [searchParams, setSearchParams] = useSearchParams();
   const { events, setEvents, openEvent, openEventForDate } = useEventModal();
   const [connections] = useConnections();
