@@ -7,6 +7,8 @@ import { useUser } from '@/contexts/UserContext';
 import { api } from '@/lib/api';
 import { generateId } from '@/utils/sampleData';
 import type { Connection, ChatMessage, CalendarEvent } from '@/utils/sampleData';
+import { deriveMilestonesFromEvents } from '@/utils/deriveMilestones';
+import { localDateStr } from '@/utils/eventTime';
 
 const OBJECTIVES = [
   'Ask on a date',
@@ -16,6 +18,14 @@ const OBJECTIVES = [
   'Keep the conversation going',
   'Plan a hangout',
 ];
+
+const EMPTY_MILESTONES = {
+  dates: 0,
+  heldHands: false,
+  kissed: false,
+  metParents: false,
+  contactStreak: 0,
+};
 
 type RizzContext = {
   connectionNotes: string;
@@ -41,13 +51,13 @@ function buildRizzContext(
     return {
       connectionNotes: '',
       eventSummaries: [],
-      milestones: { dates: 0, heldHands: false, kissed: false, metParents: false, contactStreak: 0 },
+      milestones: EMPTY_MILESTONES,
       relationship: 'connection',
       upcomingEvents: [],
     };
   }
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateStr();
   const sortedEvents = [...connectionEvents].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
@@ -56,17 +66,13 @@ function buildRizzContext(
     connectionNotes: connection.notes || '',
     eventSummaries: sortedEvents.map((e) => ({
       title: e.title,
-      notes: e.notes || '',
+      notes: e.status === 'happened' ? e.reportNotes || '' : '',
       type: e.type,
       date: e.date,
     })),
-    milestones: connection.milestones || {
-      dates: 0,
-      heldHands: false,
-      kissed: false,
-      metParents: false,
-      contactStreak: 0,
-    },
+    milestones: connection.liked
+      ? deriveMilestonesFromEvents(connection.id, connectionEvents)
+      : EMPTY_MILESTONES,
     relationship: connection.relationship || 'connection',
     upcomingEvents: connectionEvents
       .filter((e) => e.date >= today)
@@ -273,7 +279,17 @@ const RizzBotPage = () => {
 
     try {
       const res = await api.rizzbot.generate(currentUser.id, {
-        connection: connection ? { name: connection.name, notes: connection.notes, location: connection.location, relationship: connection.relationship, milestones: connection.milestones } : { name: 'them' },
+        connection: connection
+          ? {
+              name: connection.name,
+              notes: connection.notes,
+              location: connection.location,
+              relationship: connection.relationship,
+              milestones: connection.liked
+                ? deriveMilestonesFromEvents(connection.id, connectionEvents)
+                : EMPTY_MILESTONES,
+            }
+          : { name: 'them' },
         objective: selectedObjective,
         userMessage: input,
         context: rizzContext,

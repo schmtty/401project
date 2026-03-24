@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api';
 import type { CalendarEvent } from '@/utils/sampleData';
+import { migrateCalendarEvent } from '@/utils/migrateData';
 import { useUser } from '@/contexts/UserContext';
 
 export function useEvents(): [CalendarEvent[], React.Dispatch<React.SetStateAction<CalendarEvent[]>>] {
@@ -16,7 +17,7 @@ export function useEvents(): [CalendarEvent[], React.Dispatch<React.SetStateActi
     }
     try {
       const data = await api.events.getAll(currentUser.id);
-      setEventsState(data);
+      setEventsState(data.map((row: Record<string, unknown> & { id: string }) => migrateCalendarEvent(row)));
     } catch (err) {
       console.error('Failed to fetch events:', err);
       setEventsState([]);

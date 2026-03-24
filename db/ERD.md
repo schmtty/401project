@@ -71,6 +71,10 @@ Calendar events: dates, hangouts, calls, texts, etc.
 | color | VARCHAR(20) | NULL | Hex color for UI |
 | lat | DOUBLE PRECISION | NULL | Latitude (if picked on map) |
 | lng | DOUBLE PRECISION | NULL | Longitude (if picked on map) |
+| status | VARCHAR(20) | NOT NULL, DEFAULT 'planned' | 'planned', 'happened', 'fell_through' |
+| reported_at | TIMESTAMPTZ | NULL | When the user submitted an outcome report |
+| report_notes | TEXT | NULL | Notes from outcome report |
+| report_milestones | JSONB | NULL | e.g. `{ heldHands, kissed, metParents }` after report |
 | created_timestamp | TIMESTAMPTZ | DEFAULT NOW() | Server-side creation time |
 
 ---

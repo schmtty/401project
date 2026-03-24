@@ -23,11 +23,13 @@ import type { Connection } from '@/utils/sampleData';
 
 interface ConnectionCardProps {
   connection: Connection;
+  /** Streak derived from reported call/text events; falls back to stored milestone */
+  contactStreak?: number;
   onEdit?: (connection: Connection) => void;
   onDelete?: (id: string) => void;
 }
 
-const ConnectionCard = ({ connection, onEdit, onDelete }: ConnectionCardProps) => {
+const ConnectionCard = ({ connection, contactStreak, onEdit, onDelete }: ConnectionCardProps) => {
   const navigate = useNavigate();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -59,9 +61,9 @@ const ConnectionCard = ({ connection, onEdit, onDelete }: ConnectionCardProps) =
             {connection.liked && (
               <Heart size={14} className="fill-pink-500 text-pink-500 shrink-0" />
             )}
-            {connection.milestones.contactStreak >= 7 && (
+            {connection.liked && (contactStreak ?? connection.milestones.contactStreak) >= 7 && (
               <span className="flex items-center gap-0.5 text-warning text-xs">
-                <Flame size={12} /> {connection.milestones.contactStreak}
+                <Flame size={12} /> {contactStreak ?? connection.milestones.contactStreak}
               </span>
             )}
           </div>

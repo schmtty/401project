@@ -7,20 +7,59 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
+# Dependencies
+node_modules/
+
+# Environment & secrets (any folder)
 .env
-.env.local
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Build outputs
+dist
 dist-ssr
-*.local
+frontend/dist
+backend/dist
+
+# Vite / tooling caches
+.vite
+**/.vite
+.cache
+.parcel-cache
+.turbo
+*.tsbuildinfo
+
+# Test / coverage
+coverage
+.nyc_output
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Local-only overrides
+*.local
+
+# Optional: deployment tokens (Vercel, etc.)
+.vercel
+
+# Local DB dumps / certs (if you add them later)
+*.pem
+*.key
+*.sqlite
+*.db

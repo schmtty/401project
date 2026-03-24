@@ -5,10 +5,13 @@ import FeaturedCarousel from '@/components/FeaturedCarousel';
 import { useConnections } from '@/hooks/useConnections';
 import { useAddConnection } from '@/contexts/AddConnectionContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useEventModal } from '@/contexts/EventModalContext';
+import { deriveMilestonesFromEvents } from '@/utils/deriveMilestones';
 
 const ConnectionsPage = () => {
   const { open: openAddConnection, openForEdit } = useAddConnection();
   const { t } = useLanguage();
+  const { events } = useEventModal();
   const [connections, setConnections] = useConnections();
 
   const handleDelete = (id: string) => {
@@ -47,7 +50,13 @@ const ConnectionsPage = () => {
         <h2 className="text-section-title mb-3">{t('connections.all')}</h2>
         <div className="flex flex-col gap-2">
           {sorted.map(c => (
-            <ConnectionCard key={c.id} connection={c} onEdit={openForEdit} onDelete={handleDelete} />
+            <ConnectionCard
+              key={c.id}
+              connection={c}
+              contactStreak={deriveMilestonesFromEvents(c.id, events).contactStreak}
+              onEdit={openForEdit}
+              onDelete={handleDelete}
+            />
           ))}
           {sorted.length === 0 && (
             <div className="text-center py-12 text-muted-foreground">
