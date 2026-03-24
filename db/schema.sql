@@ -51,6 +51,11 @@ CREATE TABLE calendar_events (
   color VARCHAR(20) DEFAULT NULL,
   lat DOUBLE PRECISION DEFAULT NULL,
   lng DOUBLE PRECISION DEFAULT NULL,
+  -- Outcome reporting (past events): user reports whether it happened
+  status VARCHAR(20) NOT NULL DEFAULT 'planned' CHECK (status IN ('planned', 'happened', 'fell_through')),
+  reported_at TIMESTAMPTZ DEFAULT NULL,
+  report_notes TEXT DEFAULT NULL,
+  report_milestones JSONB DEFAULT NULL,
   created_timestamp TIMESTAMPTZ DEFAULT NOW()
 );
 

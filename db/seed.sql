@@ -18,14 +18,14 @@ INSERT INTO connections (id, user_id, name, age, phone, location, notes, gender,
 ('5', 'u1', 'Jake Jake', 26, '555-0105', 'Westview Park Orem', 'My absolute dog', 'male', 'friend', false, '2026-01-25', '{"dates":0,"heldHands":false,"kissed":false,"metParents":false,"contactStreak":1}');
 
 -- Calendar events (belong to u1)
-INSERT INTO calendar_events (id, user_id, title, date, time, location, notes, type, connection_id, color) VALUES
-('1', 'u1', 'Breakfast with Brooke', '2026-02-11', '10:00', 'BYU Cougareat, Provo, UT', '', 'date', '2', '#3b82f6'),
-('2', 'u1', 'Study Spanish', '2026-02-11', '11:00', 'Provo City Library, Provo, UT', '', 'other', NULL, '#ef4444'),
-('3', 'u1', 'Lunch with David', '2026-02-11', '12:00', 'BYU Wilkinson Center, Provo, UT', '', 'hangout', '3', '#22c55e'),
-('4', 'u1', 'Group Blind Date', '2026-02-11', '17:00', 'Center Street, Provo, UT', '', 'date', NULL, '#eab308'),
-('5', 'u1', 'Pickle Ball with the boys', '2026-02-14', '15:00', 'Provo Recreation Center, Provo, UT', '', 'hangout', '3', '#8b5cf6'),
-('6', 'u1', 'Date with Katelyn', '2026-02-14', '18:00', 'Brick Oven Pizza, Provo, UT', '', 'date', '2', '#ec4899'),
-('7', 'u1', 'Dinner date', '2026-02-15', '19:00', 'Happy Sumo Sushi, Provo, UT', '', 'date', '4', '#06b6d4');
+INSERT INTO calendar_events (id, user_id, title, date, time, location, notes, type, connection_id, color, status, reported_at, report_notes, report_milestones) VALUES
+('1', 'u1', 'Breakfast with Brooke', '2026-02-11', '10:00', 'BYU Cougareat, Provo, UT', '', 'date', '2', '#3b82f6', 'planned', NULL, NULL, NULL),
+('2', 'u1', 'Study Spanish', '2026-02-11', '11:00', 'Provo City Library, Provo, UT', '', 'other', NULL, '#ef4444', 'planned', NULL, NULL, NULL),
+('3', 'u1', 'Lunch with David', '2026-02-11', '12:00', 'BYU Wilkinson Center, Provo, UT', '', 'hangout', '3', '#22c55e', 'planned', NULL, NULL, NULL),
+('4', 'u1', 'Group Blind Date', '2026-02-11', '17:00', 'Center Street, Provo, UT', '', 'date', NULL, '#eab308', 'planned', NULL, NULL, NULL),
+('5', 'u1', 'Pickle Ball with the boys', '2026-02-14', '15:00', 'Provo Recreation Center, Provo, UT', '', 'hangout', '3', '#8b5cf6', 'planned', NULL, NULL, NULL),
+('6', 'u1', 'Date with Katelyn', '2026-02-14', '18:00', 'Brick Oven Pizza, Provo, UT', '', 'date', '2', '#ec4899', 'planned', NULL, NULL, NULL),
+('7', 'u1', 'Dinner date', '2026-02-15', '19:00', 'Happy Sumo Sushi, Provo, UT', '', 'date', '4', '#06b6d4', 'planned', NULL, NULL, NULL);
 
 -- Goals (belong to u1)
 INSERT INTO goals (id, user_id, title, goal_type, measure, actions, target_date, notes, category, target, current, completed, history) VALUES

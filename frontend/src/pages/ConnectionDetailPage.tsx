@@ -6,6 +6,7 @@ import PageHeader from '@/components/PageHeader';
 import { useConnections } from '@/hooks/useConnections';
 import { useAddConnection } from '@/contexts/AddConnectionContext';
 import { useEventModal } from '@/contexts/EventModalContext';
+import { deriveMilestonesFromEvents } from '@/utils/deriveMilestones';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,34 +33,39 @@ const ConnectionDetailPage = () => {
   const [editingNotes, setEditingNotes] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const connection = connections.find(c => c.id === id);
-  if (!connection) return <div className="mobile-container page-padding pt-20 text-center text-muted-foreground">Connection not found</div>;
+  const connection = connections.find((c) => c.id === id);
+  if (!connection)
+    return (
+      <div className="mobile-container page-padding pt-20 text-center text-muted-foreground">
+        Connection not found
+      </div>
+    );
 
-  const connectionEvents = events.filter(e => e.connectionId === id).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const connectionEvents = events
+    .filter((e) => e.connectionId === id)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-  const updateMilestone = (key: string, value: any) => {
-    setConnections(prev => prev.map(c =>
-      c.id === id ? { ...c, milestones: { ...c.milestones, [key]: value } } : c
-    ));
-  };
+  const derived = connection.liked ? deriveMilestonesFromEvents(connection.id, events) : null;
 
   const updateNotes = (notes: string) => {
-    setConnections(prev => prev.map(c => c.id === id ? { ...c, notes } : c));
+    setConnections((prev) => prev.map((c) => (c.id === id ? { ...c, notes } : c)));
   };
 
   const handleDelete = () => {
-    setConnections(prev => prev.filter(c => c.id !== id));
+    setConnections((prev) => prev.filter((c) => c.id !== id));
     setShowDeleteConfirm(false);
     navigate('/connections');
   };
 
-  const milestoneItems = [
-    { key: 'dates', label: 'Dates', icon: Calendar, value: connection.milestones.dates, type: 'number' as const },
-    { key: 'heldHands', label: 'Held Hands', icon: HandMetal, value: connection.milestones.heldHands, type: 'toggle' as const },
-    { key: 'kissed', label: 'Kissed', icon: Heart, value: connection.milestones.kissed, type: 'toggle' as const },
-    { key: 'metParents', label: 'Met Parents', icon: Users, value: connection.milestones.metParents, type: 'toggle' as const },
-    { key: 'contactStreak', label: 'Streak', icon: Flame, value: connection.milestones.contactStreak, type: 'number' as const },
-  ];
+  const milestoneItems = derived
+    ? [
+        { key: 'dates', label: 'Dates', icon: Calendar, value: derived.dates, type: 'number' as const },
+        { key: 'heldHands', label: 'Held Hands', icon: HandMetal, value: derived.heldHands, type: 'toggle' as const },
+        { key: 'kissed', label: 'Kissed', icon: Heart, value: derived.kissed, type: 'toggle' as const },
+        { key: 'metParents', label: 'Met Parents', icon: Users, value: derived.metParents, type: 'toggle' as const },
+        { key: 'contactStreak', label: 'Streak', icon: Flame, value: derived.contactStreak, type: 'number' as const },
+      ]
+    : [];
 
   return (
     <div className="mobile-container pb-24">
@@ -78,7 +84,10 @@ const ConnectionDetailPage = () => {
                 <Pencil size={14} className="mr-2" />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setShowDeleteConfirm(true)} className="text-destructive focus:text-destructive">
+              <DropdownMenuItem
+                onClick={() => setShowDeleteConfirm(true)}
+                className="text-destructive focus:text-destructive"
+              >
                 <Trash2 size={14} className="mr-2" />
                 Delete
               </DropdownMenuItem>
@@ -97,30 +106,38 @@ const ConnectionDetailPage = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Profile header */}
       <div className="flex flex-col items-center py-4 animate-fade-in">
         <ConnectionAvatar gender={connection.gender ?? 'male'} size={96} className="rounded-3xl mb-3 shadow-sm" />
         <h2 className="text-xl font-bold text-foreground">{connection.name}</h2>
         <p className="text-sm text-muted-foreground">Age {connection.age}</p>
         <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-          <span className="flex items-center gap-1"><Phone size={14} /> {connection.phone}</span>
-          <span className="flex items-center gap-1"><MapPin size={14} /> {connection.location}</span>
+          <span className="flex items-center gap-1">
+            <Phone size={14} /> {connection.phone}
+          </span>
+          <span className="flex items-center gap-1">
+            <MapPin size={14} /> {connection.location}
+          </span>
         </div>
       </div>
 
       <div className="page-padding space-y-5">
-        {/* Notes */}
         <section className="card-ios p-4">
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-semibold text-foreground">Notes</h3>
-            <button onClick={() => setEditingNotes(!editingNotes)} className="text-xs text-primary font-medium">
+            <button
+              onClick={() => setEditingNotes(!editingNotes)}
+              className="text-xs text-primary font-medium"
+            >
               {editingNotes ? 'Done' : 'Edit'}
             </button>
           </div>
@@ -136,50 +153,55 @@ const ConnectionDetailPage = () => {
           )}
         </section>
 
-        {/* Milestones */}
-        <section className="card-ios p-4">
-          <h3 className="font-semibold text-foreground mb-3">Milestones</h3>
-          <div className="grid grid-cols-2 gap-3">
-            {milestoneItems.map(({ key, label, icon: Icon, value, type }) => (
-              <div key={key} className="flex items-center gap-2 p-2 rounded-xl bg-secondary/50">
-                <Icon size={16} className="text-primary shrink-0" />
-                <span className="text-sm font-medium text-foreground flex-1">{label}</span>
-                {type === 'toggle' ? (
-                  <button
-                    onClick={() => updateMilestone(key, !value)}
-                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs transition-ios ${
-                      value ? 'bg-success text-success-foreground' : 'bg-muted text-muted-foreground'
-                    }`}
-                  >
-                    {value ? '✓' : '·'}
-                  </button>
-                ) : (
-                  <div className="flex items-center gap-1">
-                    <button onClick={() => updateMilestone(key, Math.max(0, (value as number) - 1))} className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs text-foreground">−</button>
-                    <span className="text-sm font-semibold text-foreground w-6 text-center">{value as number}</span>
-                    <button onClick={() => updateMilestone(key, (value as number) + 1)} className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs">+</button>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
+        {connection.liked && milestoneItems.length > 0 && (
+          <section className="card-ios p-4">
+            <h3 className="font-semibold text-foreground mb-1">Milestones</h3>
+            <p className="text-xs text-muted-foreground mb-3">Based on calendar events you&apos;ve reported</p>
+            <div className="grid grid-cols-2 gap-3">
+              {milestoneItems.map(({ key, label, icon: Icon, value, type }) => (
+                <div key={key} className="flex items-center gap-2 p-2 rounded-xl bg-secondary/50">
+                  <Icon size={16} className="text-primary shrink-0" />
+                  <span className="text-sm font-medium text-foreground flex-1">{label}</span>
+                  {type === 'toggle' ? (
+                    <span
+                      className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                        value ? 'bg-success/20 text-success' : 'bg-muted text-muted-foreground'
+                      }`}
+                    >
+                      {value ? 'Yes' : '—'}
+                    </span>
+                  ) : (
+                    <span className="text-sm font-semibold text-foreground tabular-nums w-8 text-right">
+                      {value as number}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
-        {/* Timeline */}
         <section className="card-ios p-4">
           <h3 className="font-semibold text-foreground mb-3">Timeline</h3>
           {connectionEvents.length > 0 ? (
             <div className="space-y-3">
-              {connectionEvents.map(event => (
+              {connectionEvents.map((event) => (
                 <button
                   key={event.id}
+                  type="button"
                   onClick={() => openEvent(event.id, 'view')}
                   className="w-full flex gap-3 items-start text-left hover:bg-secondary/50 rounded-xl p-2 -mx-2 transition-colors active-scale"
                 >
                   <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground">{event.title}</p>
-                    <p className="text-xs text-muted-foreground">{event.date} · {event.time}{event.location ? ` · ${event.location}` : ''}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {event.date} · {event.time}
+                      {event.location ? ` · ${event.location}` : ''}
+                    </p>
+                    {event.status !== 'planned' && (
+                      <p className="text-xs text-primary mt-0.5 capitalize">{event.status.replace(/_/g, ' ')}</p>
+                    )}
                   </div>
                 </button>
               ))}

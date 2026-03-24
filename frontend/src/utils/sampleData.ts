@@ -31,6 +31,14 @@ export const EVENT_COLORS = [
 export type EventColor = (typeof EVENT_COLORS)[number];
 
 
+export type EventStatus = 'planned' | 'happened' | 'fell_through';
+
+export interface EventReportMilestones {
+  heldHands: boolean;
+  kissed: boolean;
+  metParents: boolean;
+}
+
 export interface CalendarEvent {
   id: string;
   title: string;
@@ -44,6 +52,12 @@ export interface CalendarEvent {
   /** Lat/lng when user picked location from map */
   lat?: number;
   lng?: number;
+  /** Outcome: planned until user reports on a past event */
+  status: EventStatus;
+  reportedAt?: string | null;
+  /** Notes from post-event report (not planning notes) */
+  reportNotes: string;
+  reportMilestones?: EventReportMilestones | null;
 }
 
 export type GoalType = 'measurable' | 'completion';
@@ -104,14 +118,22 @@ export const sampleConnections: Connection[] = [
   },
 ];
 
+const eventDefaults = (
+  x: Omit<CalendarEvent, 'status' | 'reportNotes'> & Partial<Pick<CalendarEvent, 'status' | 'reportedAt' | 'reportMilestones'>>
+): CalendarEvent => ({
+  status: 'planned',
+  reportNotes: '',
+  ...x,
+});
+
 export const sampleEvents: CalendarEvent[] = [
-  { id: '1', title: 'Breakfast with Brooke', date: '2026-02-11', time: '10:00', location: 'BYU Cougareat, Provo, UT', notes: '', type: 'date', connectionId: '2', color: EVENT_COLORS[0] },
-  { id: '2', title: 'Study Spanish', date: '2026-02-11', time: '11:00', location: 'Provo City Library, Provo, UT', notes: '', type: 'other', color: EVENT_COLORS[1] },
-  { id: '3', title: 'Lunch with David', date: '2026-02-11', time: '12:00', location: 'BYU Wilkinson Center, Provo, UT', notes: '', type: 'hangout', connectionId: '3', color: EVENT_COLORS[2] },
-  { id: '4', title: 'Group Blind Date', date: '2026-02-11', time: '17:00', location: 'Center Street, Provo, UT', notes: '', type: 'date', color: EVENT_COLORS[3] },
-  { id: '5', title: 'Pickle Ball with the boys', date: '2026-02-14', time: '15:00', location: 'Provo Recreation Center, Provo, UT', notes: '', type: 'hangout', connectionId: '3', color: EVENT_COLORS[4] },
-  { id: '6', title: 'Date with Katelyn', date: '2026-02-14', time: '18:00', location: 'Brick Oven Pizza, Provo, UT', notes: '', type: 'date', connectionId: '2', color: EVENT_COLORS[5] },
-  { id: '7', title: 'Dinner date', date: '2026-02-15', time: '19:00', location: 'Happy Sumo Sushi, Provo, UT', notes: '', type: 'date', connectionId: '4', color: EVENT_COLORS[6] },
+  eventDefaults({ id: '1', title: 'Breakfast with Brooke', date: '2026-02-11', time: '10:00', location: 'BYU Cougareat, Provo, UT', notes: '', type: 'date', connectionId: '2', color: EVENT_COLORS[0] }),
+  eventDefaults({ id: '2', title: 'Study Spanish', date: '2026-02-11', time: '11:00', location: 'Provo City Library, Provo, UT', notes: '', type: 'other', color: EVENT_COLORS[1] }),
+  eventDefaults({ id: '3', title: 'Lunch with David', date: '2026-02-11', time: '12:00', location: 'BYU Wilkinson Center, Provo, UT', notes: '', type: 'hangout', connectionId: '3', color: EVENT_COLORS[2] }),
+  eventDefaults({ id: '4', title: 'Group Blind Date', date: '2026-02-11', time: '17:00', location: 'Center Street, Provo, UT', notes: '', type: 'date', color: EVENT_COLORS[3] }),
+  eventDefaults({ id: '5', title: 'Pickle Ball with the boys', date: '2026-02-14', time: '15:00', location: 'Provo Recreation Center, Provo, UT', notes: '', type: 'hangout', connectionId: '3', color: EVENT_COLORS[4] }),
+  eventDefaults({ id: '6', title: 'Date with Katelyn', date: '2026-02-14', time: '18:00', location: 'Brick Oven Pizza, Provo, UT', notes: '', type: 'date', connectionId: '2', color: EVENT_COLORS[5] }),
+  eventDefaults({ id: '7', title: 'Dinner date', date: '2026-02-15', time: '19:00', location: 'Happy Sumo Sushi, Provo, UT', notes: '', type: 'date', connectionId: '4', color: EVENT_COLORS[6] }),
 ];
 
 export const sampleGoals: Goal[] = [
