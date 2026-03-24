@@ -24,6 +24,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 const DEFAULT_CENTER: [number, number] = [40.2338, -111.6585]; // Provo, Utah County
 
@@ -83,6 +84,7 @@ function MapZoomToMarker({ coords, active }: { coords: [number, number] | null; 
 }
 
 const MapPage = () => {
+  useDocumentTitle('Map');
   const navigate = useNavigate();
   const { events, setEvents, openEvent } = useEventModal();
   const [connections] = useConnections();

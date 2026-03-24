@@ -5,8 +5,10 @@ import FeaturedCarousel from '@/components/FeaturedCarousel';
 import { useConnections } from '@/hooks/useConnections';
 import { useAddConnection } from '@/contexts/AddConnectionContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 const ConnectionsPage = () => {
+  useDocumentTitle('Connections');
   const { open: openAddConnection, openForEdit } = useAddConnection();
   const { t } = useLanguage();
   const [connections, setConnections] = useConnections();

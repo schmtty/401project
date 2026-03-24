@@ -4,10 +4,12 @@ import PageHeader from '@/components/PageHeader';
 import { useConnections } from '@/hooks/useConnections';
 import { generateId } from '@/utils/sampleData';
 import type { Connection } from '@/utils/sampleData';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 const avatars = ['👨‍🦱', '👩‍🦰', '👨', '👩', '🧔', '👱‍♀️', '👱', '🧑‍🦱'];
 
 const NewConnectionPage = () => {
+  useDocumentTitle('New Connection');
   const navigate = useNavigate();
   const [connections, setConnections] = useConnections();
   const [form, setForm] = useState({

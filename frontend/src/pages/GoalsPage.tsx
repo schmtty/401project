@@ -16,6 +16,7 @@ import {
   Filler,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler);
 
@@ -33,6 +34,7 @@ function resolveThemeColor(cssVar: string): string {
 }
 
 const GoalsPage = () => {
+  useDocumentTitle('Goals');
   const navigate = useNavigate();
   const [goals, setGoals] = useGoals();
   const [showAdd, setShowAdd] = useState(false);

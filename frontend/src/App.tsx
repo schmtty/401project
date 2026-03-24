@@ -30,7 +30,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   const { currentUser, loading } = useUser();
   const location = useLocation();
   if (loading) return <div className="min-h-screen flex items-center justify-center"><p className="text-muted-foreground">Loading...</p></div>;
-  if (!currentUser && location.pathname !== '/users' && location.pathname !== '/login') return <Navigate to="/users" replace />;
+  if (!currentUser && location.pathname !== '/users' && location.pathname !== '/login') return <Navigate to="/login" replace />;
   return <>{children}</>;
 }
 

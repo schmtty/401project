@@ -8,8 +8,10 @@ import {
   Home,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 const HomePage = () => {
+  useDocumentTitle('Home');
   const navigate = useNavigate();
   const { t } = useLanguage();
 
