@@ -175,40 +175,18 @@ const UsersPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col px-6 pt-12 pb-8">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 pb-8">
       <h1 className="text-3xl font-bold text-foreground mb-6 text-center">{t('users.title')}</h1>
-      <div className="flex-1 overflow-y-auto flex flex-col items-center gap-4 w-full max-w-md mx-auto">
-        {users.map((user) => (
-          <div key={user.id} className="flex flex-col items-center w-full">
-            <button
-              onClick={() => handleSelectUser(user)}
-              className="group flex flex-col items-center gap-3 tap-target w-full py-4 px-6 rounded-2xl bg-secondary/50 hover:bg-secondary transition-all"
-            >
-              <div className="w-28 h-28 rounded-2xl bg-secondary flex items-center justify-center text-6xl transition-all group-hover:scale-105 group-hover:ring-2 group-hover:ring-primary">
-                {user.avatar || '👨'}
-              </div>
-              <span className="text-xl font-medium text-foreground">{user.name}</span>
-            </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); setRemoveConfirm(user); }}
-              className="mt-2 p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-              title={t('users.removeProfile')}
-            >
-              <Trash2 size={18} />
-            </button>
+      <div className="flex flex-col items-center gap-4 w-full max-w-md mx-auto">
+        <button
+          onClick={() => setShowAdd(true)}
+          className="flex flex-col items-center gap-3 tap-target w-full py-4 px-6 rounded-2xl border-2 border-dashed border-muted-foreground/50 hover:border-primary hover:text-primary transition-all"
+        >
+          <div className="w-28 h-28 rounded-2xl flex items-center justify-center text-5xl text-muted-foreground">
+            <Plus size={48} />
           </div>
-        ))}
-        {users.length < MAX_USERS && (
-          <button
-            onClick={() => setShowAdd(true)}
-            className="flex flex-col items-center gap-3 tap-target w-full py-4 px-6 rounded-2xl border-2 border-dashed border-muted-foreground/50 hover:border-primary hover:text-primary transition-all"
-          >
-            <div className="w-28 h-28 rounded-2xl flex items-center justify-center text-5xl text-muted-foreground">
-              <Plus size={48} />
-            </div>
-            <span className="text-xl font-medium text-muted-foreground">{t('users.addProfile')}</span>
-          </button>
-        )}
+          <span className="text-xl font-medium text-muted-foreground">{t('users.addProfile')}</span>
+        </button>
       </div>
 
       <p className="text-center text-sm text-muted-foreground mt-4">
@@ -217,21 +195,6 @@ const UsersPage = () => {
           Sign in
         </Link>
       </p>
-
-      <AlertDialog open={!!removeConfirm} onOpenChange={() => setRemoveConfirm(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('users.removeProfile')}</AlertDialogTitle>
-            <AlertDialogDescription>{t('users.removeConfirm')}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t('users.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleRemoveUser} className="bg-destructive text-destructive-foreground">
-              {t('users.remove')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 };
