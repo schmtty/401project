@@ -8,8 +8,8 @@ export type Language = 'en' | 'es' | 'zh';
 export const translations: Record<Language, Record<string, string>> = {
   en: {
     // App
-    'app.title': 'Area Book 2.0',
-    'app.about': 'Area Book 2.0 — Relationship planner & goal tracker for young single adults. Track connections, events, and milestones all in one place.',
+    'app.title': 'Keeper',
+    'app.about': 'Keeper — Relationship planner & goal tracker for young single adults. Track connections, events, and milestones all in one place.',
 
     // Nav
     'nav.add': 'Add',
@@ -43,7 +43,7 @@ export const translations: Record<Language, Record<string, string>> = {
     // Settings
     'settings.title': 'Settings',
     'settings.theme': 'Theme',
-    'settings.themeDesc': 'Change how Area Book looks',
+    'settings.themeDesc': 'Change how Keeper looks',
     'settings.profile': 'Profile',
     'settings.profileName': 'Profile Name',
     'settings.avatar': 'Avatar',
@@ -158,8 +158,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.back': 'Back',
   },
   es: {
-    'app.title': 'Area Book 2.0',
-    'app.about': 'Area Book 2.0 — Planificador de relaciones y rastreador de metas para jóvenes adultos solteros. Rastrea conexiones, eventos e hitos en un solo lugar.',
+    'app.title': 'Keeper',
+    'app.about': 'Keeper — Planificador de relaciones y rastreador de metas para jóvenes adultos solteros. Rastrea conexiones, eventos e hitos en un solo lugar.',
     'nav.add': 'Añadir',
     'nav.home': 'Inicio',
     'nav.settings': 'Ajustes',
@@ -185,7 +185,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'users.remove': 'Eliminar',
     'settings.title': 'Ajustes',
     'settings.theme': 'Tema',
-    'settings.themeDesc': 'Cambiar la apariencia de Area Book',
+    'settings.themeDesc': 'Cambiar la apariencia de Keeper',
     'settings.profile': 'Perfil',
     'settings.profileName': 'Nombre del perfil',
     'settings.avatar': 'Avatar',
@@ -288,8 +288,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.back': 'Atrás',
   },
   zh: {
-    'app.title': 'Area Book 2.0',
-    'app.about': 'Area Book 2.0 — 面向年轻单身成年人的关系规划和目标追踪应用。在一个地方追踪人脉、活动和里程碑。',
+    'app.title': 'Keeper',
+    'app.about': 'Keeper — 面向年轻单身成年人的关系规划和目标追踪应用。在一个地方追踪人脉、活动和里程碑。',
     'nav.add': '添加',
     'nav.home': '首页',
     'nav.settings': '设置',
@@ -315,7 +315,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'users.remove': '删除',
     'settings.title': '设置',
     'settings.theme': '主题',
-    'settings.themeDesc': '更改 Area Book 的外观',
+    'settings.themeDesc': '更改 Keeper 的外观',
     'settings.profile': '档案',
     'settings.profileName': '档案名称',
     'settings.avatar': '头像',

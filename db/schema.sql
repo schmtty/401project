@@ -1,4 +1,4 @@
--- Area Book 2.0 - PostgreSQL Schema
+-- Keeper - PostgreSQL Schema
 -- 5 tables: users, user_settings, connections, calendar_events, goals
 
 -- Users: profiles (max 5 per app, Netflix-style)

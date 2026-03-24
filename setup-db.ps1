@@ -1,10 +1,10 @@
-# Area Book 2.0 - Database Setup Script
+# Keeper - Database Setup Script
 # Run this after updating backend/.env with your PostgreSQL password
 # Usage: .\setup-db.ps1
 # Or with password: $env:PGPASSWORD='your_password'; .\setup-db.ps1
 
 $ErrorActionPreference = "Stop"
-Write-Host "Setting up Area Book 2.0 database..." -ForegroundColor Cyan
+Write-Host "Setting up Keeper database..." -ForegroundColor Cyan
 
 # Create database
 psql -U postgres -c "DROP DATABASE IF EXISTS ab2;"

@@ -1,4 +1,4 @@
-# Area Book 2.0 — Rubric Evaluation
+# Keeper — Rubric Evaluation
 
 **Date:** February 21, 2026  
 **Purpose:** Pre-submission checklist to verify readiness for professor review.

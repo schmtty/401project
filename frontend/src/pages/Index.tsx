@@ -6,8 +6,8 @@ import {
   Calendar,
   Target,
   MessageCircle,
-  Home,
 } from "lucide-react";
+import { AppLogo } from "@/components/AppLogo";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useEventModal } from "@/contexts/EventModalContext";
 import { eventNeedsReport } from "@/utils/eventTime";
@@ -35,8 +35,8 @@ const HomePage = () => {
   return (
     <div className="mobile-container flex flex-col items-center justify-center min-h-screen px-8 pb-24">
       <div className="flex flex-col items-center mb-10 animate-fade-in">
-        <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary/30 to-accent/30 border border-primary/20 flex items-center justify-center mb-4 shadow-lg">
-          <Home size={40} className="text-primary" />
+        <div className="mb-4 flex items-center justify-center">
+          <AppLogo className="h-[10.5rem] w-auto max-w-[min(420px,90vw)] object-contain drop-shadow-md" />
         </div>
         <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent tracking-tight">
           {t("app.title")}

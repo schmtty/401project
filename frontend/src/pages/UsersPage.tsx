@@ -4,6 +4,7 @@ import { useUser } from '@/contexts/UserContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AVATAR_OPTIONS } from '@/constants/avatars';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { AppLogo } from '@/components/AppLogo';
 
 const MAX_USERS = 5;
 
@@ -45,7 +46,10 @@ const UsersPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-8">
-      <h1 className="text-3xl font-bold text-foreground text-center mb-2">Area Book</h1>
+      <div className="flex justify-center mb-4">
+        <AppLogo className="h-[7.5rem] w-auto max-w-[300px] object-contain" />
+      </div>
+      <h1 className="text-3xl font-bold text-foreground text-center mb-2">{t('app.title')}</h1>
       <p className="text-muted-foreground text-center mb-8">Create a new account</p>
       <form onSubmit={handleCreateUser} className="w-full max-w-sm space-y-4">
         <div>

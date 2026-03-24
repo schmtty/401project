@@ -1,4 +1,4 @@
-# Area Book 2.0 - Entity Relationship Diagram
+# Keeper - Entity Relationship Diagram
 
 ## Tables Overview (5 tables)
 

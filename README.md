@@ -1,8 +1,8 @@
-# Area Book 2.0
+# Keeper
 
 ## App Summary
 
-Area Book 2.0 is a relationship planner and goal tracker for young single adults. It helps you manage **connections** (people you track), **calendar events** (dates, hangouts, calls, etc.), **personal goals** across categories (love, fitness, school, work, social), and optional **RizzBot** texting feedback.
+**Keeper** is a relationship planner and goal tracker for young single adults. It helps you manage **connections** (people you track), **calendar events** (dates, hangouts, calls, etc.), **personal goals** across categories (love, fitness, school, work, social), and optional **RizzBot** texting feedback.
 
 **Connections** store basics (name, age, contact info, relationship type) plus **milestones** (dates count, held hands, kissed, met parents, contact streak). A **liked** flag marks people you are actively investing in romantically or socially. Milestone UI and coaching context are **gated on “liked”**: connection cards show the flame streak only for liked people; the connection detail milestones section and RizzBot milestone hints apply only when that person is liked.
 
@@ -233,11 +233,20 @@ You can also open a **past calendar event**, report **Happened** or **Fell Throu
 
 ---
 
+## Brand assets
+
+The app logo and favicon use the same image: **`frontend/public/keeper-logo.png`**. Vite serves everything in `public/` at the site root (for example `/keeper-logo.png` in `index.html` and in the `AppLogo` component).
+
+---
+
 ## Project Structure
 
 ```
 401project-2/          # root folder name may differ
 ├── frontend/
+│   ├── public/
+│   │   ├── keeper-logo.png   # logo + favicon source
+│   │   └── ...
 │   ├── src/
 │   │   ├── components/
 │   │   ├── constants/

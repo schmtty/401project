@@ -1,4 +1,4 @@
-const GEOCODE_CACHE_KEY = 'area-book-geocode-cache';
+const GEOCODE_CACHE_KEY = 'keeper-geocode-cache';
 const CACHE_DAYS = 30;
 
 interface CachedResult {
@@ -51,7 +51,7 @@ export async function geocodeLocation(location: string): Promise<{ lat: number; 
       {
         headers: {
           'Accept-Language': 'en',
-          'User-Agent': 'AreaBook2.0/1.0 (Educational Project; datemap@example.com)',
+          'User-Agent': 'Keeper/1.0 (Educational Project; datemap@example.com)',
         },
       }
     );
@@ -77,7 +77,7 @@ export async function reverseGeocode(lat: number, lng: number): Promise<string |
       {
         headers: {
           'Accept-Language': 'en',
-          'User-Agent': 'AreaBook2.0/1.0 (Educational Project; datemap@example.com)',
+          'User-Agent': 'Keeper/1.0 (Educational Project; datemap@example.com)',
         },
       }
     );

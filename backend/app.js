@@ -24,7 +24,7 @@ app.use('/api/events', eventsRouter);
 app.use('/api/goals', goalsRouter);
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Area Book API running' });
+  res.json({ status: 'ok', message: 'Keeper API running' });
 });
 
 export default app;

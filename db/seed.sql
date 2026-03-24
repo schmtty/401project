@@ -1,4 +1,4 @@
--- Area Book 2.0 - Seed Data
+-- Keeper - Seed Data
 -- Users first (required for FK), then settings, then connections/events/goals
 
 -- Users (default profile)

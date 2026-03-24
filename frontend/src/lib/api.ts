@@ -1,5 +1,5 @@
 /**
- * API client for Area Book backend
+ * API client for Keeper backend
  * Sends X-User-Id header when userId is set
  */
 

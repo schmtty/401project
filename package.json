@@ -1,7 +1,7 @@
 {
-  "name": "area-book-2",
+  "name": "keeper",
   "private": true,
-  "description": "Area Book 2.0 - PERN stack",
+  "description": "Keeper - PERN stack relationship planner",
   "type": "module",
   "dependencies": {
     "@google/genai": "^1.46.0",
