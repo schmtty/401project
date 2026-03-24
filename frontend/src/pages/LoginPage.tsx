@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { AppLogo } from '@/components/AppLogo';
 
 const LoginPage = () => {
   useDocumentTitle('Sign In');
@@ -59,8 +60,11 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-8">
       <div className="w-full max-w-sm">
+        <div className="flex justify-center mb-4">
+          <AppLogo className="h-[7.5rem] w-auto max-w-[300px] object-contain" />
+        </div>
         <h1 className="text-3xl font-bold text-foreground text-center mb-2">
-          Area Book
+          {t('app.title')}
         </h1>
         <p className="text-muted-foreground text-center mb-8">
           Sign in to your profile

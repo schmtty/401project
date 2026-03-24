@@ -29,7 +29,7 @@ interface UserContextType {
   refetchUsers: () => Promise<void>;
 }
 
-const CURRENT_USER_KEY = 'area-book-current-user';
+const CURRENT_USER_KEY = 'keeper-current-user';
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 

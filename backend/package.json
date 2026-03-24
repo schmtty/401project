@@ -1,7 +1,7 @@
 {
-  "name": "area-book-backend",
+  "name": "keeper-backend",
   "version": "1.0.0",
-  "description": "Area Book 2.0 Express API",
+  "description": "Keeper Express API",
   "type": "module",
   "main": "server.js",
   "scripts": {
