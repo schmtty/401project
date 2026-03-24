@@ -2,7 +2,9 @@
   "name": "area-book-2",
   "private": true,
   "description": "Area Book 2.0 - PERN stack",
+  "type": "module",
   "dependencies": {
+    "@google/genai": "^1.46.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",

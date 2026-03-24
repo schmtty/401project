@@ -12,6 +12,7 @@ const databaseUrl = process.env.DATABASE_URL;
 const useSsl =
   process.env.PGSSL === 'true' ||
   process.env.PGSSLMODE === 'require' ||
+  (databaseUrl && databaseUrl.includes('sslmode=require')) ||
   (process.env.NODE_ENV === 'production' && databaseUrl && !databaseUrl.includes('localhost'));
 
 const pool = new Pool({
