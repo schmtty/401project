@@ -6,6 +6,7 @@ import {
   Target,
   MessageCircle,
   Home,
+  LayoutDashboard,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -19,6 +20,7 @@ const HomePage = () => {
     { path: "/calendar", labelKey: "home.calendar", icon: Calendar },
     { path: "/goals", labelKey: "home.goals", icon: Target },
     { path: "/rizzbot", labelKey: "home.rizzbot", icon: MessageCircle },
+    { path: "/dashboard", labelKey: "home.dashboard", icon: LayoutDashboard },
   ];
 
   return (

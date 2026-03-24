@@ -216,7 +216,7 @@ The **Add Connection** button is fully wired to the backend. Follow these steps 
 │   │   ├── contexts/
 │   │   ├── hooks/
 │   │   ├── lib/
-│   │   ├── pages/
+│   │   ├── pages/          ← includes DashboardPage.tsx (new)
 │   │   └── utils/
 │   ├── package.json
 │   └── vite.config.ts
@@ -245,13 +245,13 @@ The **Add Connection** button is fully wired to the backend. Follow these steps 
 1. **Ubiquitous:** The system shall synchronize all goals, calendar events, and dating milestones across the app.
 2. **Event-Driven:** When a user applies a filter, the system shall organize the calendar events around that filter. *(Implemented on Map page: filter events by connection.)*
 3. **State-Driven:** While the user is creating a calendar event, the calendar portion shall guide the user through event creation. *(Event modal provides a structured form: title, date, time, type, location, notes, connection, color.)*
+4. **Ubiquitous:** The system shall display a Key Indicator (KI) Dashboard that summarizes progress toward both personal and relationship goals. *(Implemented as `/dashboard` — see KI Dashboard section below.)*
+5. **Event-Driven:** When a user creates a new contact in the dating section, the system shall prompt the user to assign a "Next Step" task (to push the person forward in dating). *(Implemented as a post-save modal — see Next Step Prompt section below.)*
 
 ### Not Complete
 
-1. **Ubiquitous:** The system shall display a Key Indicator (KI) Dashboard that summarizes progress toward both personal and relationship goals.
-2. **Event-Driven:** When a user creates a new contact in the dating section, the system shall prompt the user to assign a "Next Step" task (to push the person forward in dating).
-3. **Event-Driven:** When a user applies a filter, the system shall organize the goals around that filter. *(Map filters events by connection; Goals page has no filter.)*
-4. **State-Driven:** While the user is in the finding portion of the app, the system shall display other users to create matches. *(No discovery/matching feature exists.)*
+1. **Event-Driven:** When a user applies a filter, the system shall organize the goals around that filter. *(Map filters events by connection; Goals page has no filter.)*
+2. **State-Driven:** While the user is in the finding portion of the app, the system shall display other users to create matches. *(No discovery/matching feature exists.)*
 
 ---
 
@@ -261,6 +261,55 @@ The **Add Connection** button is fully wired to the backend. Follow these steps 
 - **Connections**: Track people with milestones (dates, held hands, kissed, met parents, streak)
 - **Calendar events**: Dates, hangouts, calls with optional connection links
 - **Goals**: Measurable or completion-based, with progress history
+- **KI Dashboard**: Aggregated Key Indicator view of all goals and relationship stats
+- **Next Step Prompts**: Post-save action sheet after adding a new connection
 - **Per-user theme**: Light, dark, pastel, comfort, sunset
 - **Per-user language**: English, Spanish, Chinese (Simplified)
 - **Editable profile**: Name and avatar (20 emoji options, including dinosaurs 🦕🦖) in Settings
+
+---
+
+## KI Dashboard (`/dashboard`)
+
+**File:** `frontend/src/pages/DashboardPage.tsx`
+
+The KI Dashboard is a read-only summary page that aggregates data from Goals, Connections, and Calendar Events into a single at-a-glance view. It satisfies the EARS requirement: *"The system shall display a Key Indicator (KI) Dashboard that summarizes progress toward both personal and relationship goals."*
+
+### Sections
+
+**Overall Progress Ring** — A circular progress ring showing the average completion percentage across all active goal categories. The label adjusts dynamically based on score (e.g., "Crushing it! 🔥" above 80%).
+
+**Goal Progress by Category** — A 2-column grid with one card per category (Love, Fitness, School, Work, Social). Each card shows the category icon, a thin progress bar, the goal count, and the category-average completion percentage. Tapping any card navigates to `/goals`.
+
+**Relationship Indicators** — Four stat cards showing: total connections, total dates logged across all connections, number of connections where "held hands" milestone is reached, and the highest contact streak across all connections. Tapping navigates to `/connections`.
+
+**Upcoming Events (Next 7 Days)** — A list of calendar events with a date within the next 7 days, sorted chronologically, showing up to 4 with a "+N more" overflow button. Tapping navigates to `/calendar`.
+
+### Data flow
+
+The page uses `useGoals()`, `useConnections()`, and `useEvents()` hooks — all of which hit the PostgreSQL-backed API and are scoped to the active `X-User-Id` header. No local state is written; the page is purely derived from existing data.
+
+### Navigation
+
+The Dashboard is accessible from the home screen menu (labeled "Dashboard" / "Panel" / "仪表板" depending on language). Route: `GET /dashboard`.
+
+---
+
+## Next Step Prompt
+
+**File:** `frontend/src/contexts/AddConnectionContext.tsx` (updated)
+
+After a user saves a **new** connection (not an edit), a bottom-sheet modal appears asking *"What's your next step with [Name]?"* This satisfies the EARS requirement: *"When a user creates a new contact in the dating section, the system shall prompt the user to assign a 'Next Step' task."*
+
+### Available Actions
+
+| Option | Behavior |
+|--------|----------|
+| **Text them** | Acknowledges intent; modal closes. User follows up manually. |
+| **Call them** | Acknowledges intent; modal closes. User follows up manually. |
+| **Plan a date** | Creates a draft `date`-type calendar event titled "Date with [Name]" for tomorrow at 6:00 PM, linked to the new connection's ID. The event is immediately persisted to PostgreSQL via `POST /api/events`. |
+| **Skip for now** | Closes the modal with no action. |
+
+### Implementation details
+
+The `AddConnectionProvider` now maintains a `pendingNextStep: Connection | null` state. When a new connection is saved, the add-connection sheet closes immediately and `pendingNextStep` is set to the newly-created connection, triggering the `NextStepModal` to render at `z-[70]` (above all other UI). Choosing "Plan a date" calls `setEvents()` which syncs to the backend via the existing `useEvents` hook. All other choices simply clear `pendingNextStep`.

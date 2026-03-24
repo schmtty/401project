@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
-import { User, Heart } from 'lucide-react';
+import { User, Heart, MessageCircle, Phone, CalendarDays, ArrowRight, X } from 'lucide-react';
 import { useConnections } from '@/hooks/useConnections';
+import { useEvents } from '@/hooks/useEvents';
 import { generateId } from '@/utils/sampleData';
 import type { Connection, ConnectionGender, ConnectionRelationship } from '@/utils/sampleData';
 
@@ -39,7 +40,11 @@ export function AddConnectionProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [connections, setConnections] = useConnections();
+  const [, setEvents] = useEvents();
   const [form, setForm] = useState<FormState>(initialForm);
+
+  // Holds the newly-created connection while the Next Step prompt is visible
+  const [pendingNextStep, setPendingNextStep] = useState<Connection | null>(null);
 
   const open = useCallback(() => {
     setEditingId(null);
@@ -89,6 +94,7 @@ export function AddConnectionProvider({ children }: { children: ReactNode }) {
             : c
         )
       );
+      close();
     } else {
       const newConnection: Connection = {
         id: generateId(),
@@ -104,8 +110,41 @@ export function AddConnectionProvider({ children }: { children: ReactNode }) {
         milestones: { dates: 0, heldHands: false, kissed: false, metParents: false, contactStreak: 0 },
       };
       setConnections((prev) => [...prev, newConnection]);
+
+      // Close the add-connection sheet, then show the Next Step prompt
+      setIsOpen(false);
+      setEditingId(null);
+      setForm(initialForm);
+      setPendingNextStep(newConnection);
     }
-    close();
+  };
+
+  const handleNextStep = (step: 'text' | 'call' | 'date' | 'skip') => {
+    if (!pendingNextStep) return;
+
+    if (step === 'date') {
+      // Create a placeholder calendar event for tomorrow
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const dateStr = tomorrow.toISOString().split('T')[0];
+      setEvents((prev) => [
+        ...prev,
+        {
+          id: generateId(),
+          title: `Date with ${pendingNextStep.name}`,
+          date: dateStr,
+          time: '18:00',
+          location: '',
+          notes: 'Created from Next Step prompt',
+          type: 'date',
+          connectionId: pendingNextStep.id,
+          color: '#ec4899',
+        },
+      ]);
+    }
+
+    // All other steps (text, call, skip) simply acknowledge and close
+    setPendingNextStep(null);
   };
 
   return (
@@ -120,9 +159,17 @@ export function AddConnectionProvider({ children }: { children: ReactNode }) {
           isEdit={!!editingId}
         />
       )}
+      {pendingNextStep && (
+        <NextStepModal
+          connectionName={pendingNextStep.name}
+          onSelect={handleNextStep}
+        />
+      )}
     </AddConnectionContext.Provider>
   );
 }
+
+// ─── Add Connection Modal ────────────────────────────────────────────────────
 
 function AddConnectionModal({
   form,
@@ -250,6 +297,109 @@ function AddConnectionModal({
               {isEdit ? 'Save Changes' : 'Add Connection'}
             </button>
           </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Next Step Modal ─────────────────────────────────────────────────────────
+
+function NextStepModal({
+  connectionName,
+  onSelect,
+}: {
+  connectionName: string;
+  onSelect: (step: 'text' | 'call' | 'date' | 'skip') => void;
+}) {
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
+  }, []);
+
+  const steps: {
+    key: 'text' | 'call' | 'date' | 'skip';
+    label: string;
+    sub: string;
+    icon: typeof MessageCircle;
+    color: string;
+    bg: string;
+  }[] = [
+    {
+      key: 'text',
+      label: 'Text them',
+      sub: 'Send a quick message',
+      icon: MessageCircle,
+      color: 'text-blue-600',
+      bg: 'bg-blue-500/10',
+    },
+    {
+      key: 'call',
+      label: 'Call them',
+      sub: 'Give them a ring',
+      icon: Phone,
+      color: 'text-green-600',
+      bg: 'bg-green-500/10',
+    },
+    {
+      key: 'date',
+      label: 'Plan a date',
+      sub: 'Add to your calendar',
+      icon: CalendarDays,
+      color: 'text-pink-600',
+      bg: 'bg-pink-500/10',
+    },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-[70] flex items-end overflow-hidden">
+      <div
+        className="absolute inset-0 bg-foreground/30 backdrop-blur-sm"
+        onClick={() => onSelect('skip')}
+        aria-hidden
+      />
+      <div className="relative w-full max-w-md mx-auto bg-card rounded-t-3xl overflow-hidden animate-slide-up">
+        {/* Header */}
+        <div className="flex items-center justify-between p-5 border-b border-border">
+          <div>
+            <h3 className="text-lg font-bold text-foreground">What's your next step?</h3>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              You added <span className="font-semibold text-foreground">{connectionName}</span>
+            </p>
+          </div>
+          <button
+            onClick={() => onSelect('skip')}
+            className="tap-target flex items-center justify-center text-muted-foreground active-scale"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Options */}
+        <div className="p-5 space-y-3 pb-10">
+          {steps.map(({ key, label, sub, icon: Icon, color, bg }) => (
+            <button
+              key={key}
+              onClick={() => onSelect(key)}
+              className="w-full flex items-center gap-4 p-4 rounded-2xl bg-secondary active-scale transition-ios text-left"
+            >
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${bg}`}>
+                <Icon size={22} className={color} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-foreground">{label}</p>
+                <p className="text-xs text-muted-foreground">{sub}</p>
+              </div>
+              <ArrowRight size={18} className="text-muted-foreground flex-shrink-0" />
+            </button>
+          ))}
+
+          <button
+            onClick={() => onSelect('skip')}
+            className="w-full py-3 text-sm text-muted-foreground font-medium active-scale"
+          >
+            Skip for now
+          </button>
         </div>
       </div>
     </div>

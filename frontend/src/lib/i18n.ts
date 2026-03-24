@@ -22,6 +22,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'home.map': 'Map',
     'home.goals': 'Goals',
     'home.rizzbot': 'RizzBot',
+    'home.dashboard': 'Dashboard',
 
     // Users
     'users.title': 'Select Profile',
@@ -168,6 +169,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'home.map': 'Mapa',
     'home.goals': 'Metas',
     'home.rizzbot': 'RizzBot',
+    'home.dashboard': 'Panel',
     'users.title': 'Seleccionar perfil',
     'users.addProfile': 'Añadir perfil',
     'users.manageProfiles': 'Administrar perfiles',
@@ -298,6 +300,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'home.map': '地图',
     'home.goals': '目标',
     'home.rizzbot': 'RizzBot',
+    'home.dashboard': '仪表板',
     'users.title': '选择档案',
     'users.addProfile': '添加档案',
     'users.manageProfiles': '管理档案',
