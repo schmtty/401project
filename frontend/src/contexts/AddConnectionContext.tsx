@@ -143,6 +143,7 @@ export function AddConnectionProvider({ children }: { children: ReactNode }) {
         <AddConnectionModal
           form={form}
           setForm={setForm}
+          phoneError={phoneError}
           onSubmit={handleSubmit}
           onClose={close}
           isEdit={!!editingId}
@@ -155,12 +156,14 @@ export function AddConnectionProvider({ children }: { children: ReactNode }) {
 function AddConnectionModal({
   form,
   setForm,
+  phoneError,
   onSubmit,
   onClose,
   isEdit,
 }: {
   form: FormState;
   setForm: React.Dispatch<React.SetStateAction<FormState>>;
+  phoneError: string;
   onSubmit: (e: React.FormEvent) => void;
   onClose: () => void;
   isEdit: boolean;
