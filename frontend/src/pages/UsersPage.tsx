@@ -6,8 +6,6 @@ import { AVATAR_OPTIONS } from '@/constants/avatars';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { AppLogo } from '@/components/AppLogo';
 
-const MAX_USERS = 5;
-
 const UsersPage = () => {
   useDocumentTitle('Create Account');
   const navigate = useNavigate();
@@ -21,10 +19,6 @@ const UsersPage = () => {
     setError('');
     if (!addForm.name.trim()) {
       setError('Profile name is required');
-      return;
-    }
-    if (users.length >= MAX_USERS) {
-      setError(t('users.maxReached'));
       return;
     }
     const created = await createUser(addForm.name, addForm.avatar, addForm.pin || undefined);

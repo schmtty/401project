@@ -34,7 +34,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'users.signIn': 'Sign In',
     'users.pinPlaceholder': '4-digit PIN to restrict access',
     'users.chooseAvatar': 'Choose Avatar',
-    'users.maxReached': 'Maximum 5 profiles. Remove one to add another.',
+    'users.maxReached': 'Could not create profile. Please try again.',
     'users.removeProfile': 'Remove Profile',
     'users.removeConfirm': 'Remove this profile? All connections, events, and goals will be deleted. This cannot be undone.',
     'users.cancel': 'Cancel',
