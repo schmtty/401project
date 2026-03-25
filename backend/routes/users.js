@@ -1,5 +1,5 @@
 /**
- * Users API - CRUD for user profiles (max 5)
+ * Users API - CRUD for user profiles
  * GET /api/users
  * POST /api/users
  * PUT /api/users/:id
@@ -9,7 +9,6 @@ import express from 'express';
 import pool from '../db.js';
 
 const router = express.Router();
-const MAX_USERS = 5;
 
 // GET all users
 router.get('/', async (req, res) => {
@@ -25,10 +24,6 @@ router.get('/', async (req, res) => {
 // POST create user
 router.post('/', async (req, res) => {
   try {
-    const count = await pool.query('SELECT COUNT(*) FROM users');
-    if (parseInt(count.rows[0].count) >= MAX_USERS) {
-      return res.status(400).json({ error: `Maximum ${MAX_USERS} users allowed` });
-    }
     const { id, name, pin, avatar } = req.body;
     if (!id || !name) {
       return res.status(400).json({ error: 'id and name are required' });
