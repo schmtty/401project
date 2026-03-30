@@ -4,9 +4,10 @@ import type { Language } from '@/lib/i18n';
 
 export interface User {
   id: string;
+  username: string;
   name: string;
-  pin: string | null;
   avatar: string;
+  mustResetPassword?: boolean;
   createdAt?: string;
 }
 
@@ -20,9 +21,10 @@ interface UserContextType {
   settings: UserSettings | null;
   users: User[];
   loading: boolean;
-  selectUser: (user: User, pin?: string) => Promise<boolean>;
-  createUser: (name: string, avatar: string, pin?: string) => Promise<User | null>;
-  updateUser: (id: string, updates: { name?: string; avatar?: string; pin?: string | null }) => Promise<void>;
+  login: (username: string, password: string) => Promise<User | null>;
+  createUser: (name: string, username: string, password: string, avatar: string) => Promise<User | null>;
+  setPassword: (id: string, currentPassword: string, newPassword: string) => Promise<User>;
+  updateUser: (id: string, updates: { name?: string; avatar?: string; username?: string }) => Promise<void>;
   removeUser: (id: string) => Promise<void>;
   signOut: () => void;
   updateSettings: (updates: Partial<UserSettings>) => Promise<void>;
@@ -82,26 +84,21 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   }, [currentUser?.id]);
 
-  const selectUser = useCallback(
-    async (user: User, pin?: string): Promise<boolean> => {
-      if (user.pin && pin !== user.pin) {
-        try {
-          const { valid } = await api.users.verifyPin(user.id, pin || '');
-          if (!valid) return false;
-        } catch {
-          return false;
-        }
-      }
+  const login = useCallback(async (username: string, password: string): Promise<User | null> => {
+    try {
+      const user = await api.users.login(username, password);
       setCurrentUser(user);
-      return true;
-    },
-    []
-  );
+      return user;
+    } catch (err) {
+      console.error('Login failed:', err);
+      return null;
+    }
+  }, []);
 
-  const createUser = useCallback(async (name: string, avatar: string, pin?: string): Promise<User | null> => {
+  const createUser = useCallback(async (name: string, username: string, password: string, avatar: string): Promise<User | null> => {
     try {
       const id = `u_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
-      const created = await api.users.create({ id, name, avatar, pin: pin || null });
+      const created = await api.users.create({ id, name, username, password, avatar });
       await refetchUsers();
       return created;
     } catch (err) {
@@ -110,8 +107,17 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   }, [refetchUsers]);
 
+  const setPassword = useCallback(async (id: string, currentPassword: string, newPassword: string): Promise<User> => {
+    const updated = await api.users.setPassword(id, currentPassword, newPassword);
+    await refetchUsers();
+    if (currentUser?.id === id) {
+      setCurrentUser(updated);
+    }
+    return updated;
+  }, [currentUser?.id, refetchUsers]);
+
   const updateUser = useCallback(
-    async (id: string, updates: { name?: string; avatar?: string; pin?: string | null }) => {
+    async (id: string, updates: { name?: string; avatar?: string; username?: string }) => {
       await api.users.update(id, updates);
       await refetchUsers();
       if (currentUser?.id === id) {
@@ -152,8 +158,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
         settings,
         users,
         loading,
-        selectUser,
+        login,
         createUser,
+        setPassword,
         updateUser,
         removeUser,
         signOut,

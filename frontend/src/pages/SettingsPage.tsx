@@ -41,7 +41,7 @@ const SettingsPage = () => {
 
   const handleChangeUser = () => {
     signOut();
-    navigate('/users');
+    navigate('/login');
   };
 
   if (!currentUser) return null;

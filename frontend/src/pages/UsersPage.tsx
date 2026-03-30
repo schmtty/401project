@@ -9,24 +9,46 @@ import { AppLogo } from '@/components/AppLogo';
 const UsersPage = () => {
   useDocumentTitle('Create Account');
   const navigate = useNavigate();
-  const { users, loading, selectUser, createUser } = useUser();
+  const { users, loading, login, createUser } = useUser();
   const { t } = useLanguage();
-  const [addForm, setAddForm] = useState({ name: '', avatar: AVATAR_OPTIONS[0], pin: '' });
+  const [addForm, setAddForm] = useState({
+    name: '',
+    username: '',
+    password: '',
+    confirmPassword: '',
+    avatar: AVATAR_OPTIONS[0],
+  });
   const [error, setError] = useState('');
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     if (!addForm.name.trim()) {
-      setError('Profile name is required');
+      setError(t('auth.profileNameRequired'));
       return;
     }
-    const created = await createUser(addForm.name, addForm.avatar, addForm.pin || undefined);
+    if (users.length >= 5) {
+      setError(t('users.maxReached'));
+      return;
+    }
+    if (!addForm.username.trim()) {
+      setError(t('auth.usernameRequired'));
+      return;
+    }
+    if (addForm.password.length < 8) {
+      setError(t('auth.passwordMin'));
+      return;
+    }
+    if (addForm.password !== addForm.confirmPassword) {
+      setError(t('auth.passwordMismatch'));
+      return;
+    }
+    const created = await createUser(addForm.name, addForm.username, addForm.password, addForm.avatar);
     if (created) {
-      await selectUser(created);
+      await login(addForm.username, addForm.password);
       navigate('/');
     } else {
-      setError(t('users.maxReached'));
+      setError(t('auth.createFailed'));
     }
   };
 
@@ -44,7 +66,7 @@ const UsersPage = () => {
         <AppLogo className="h-[7.5rem] w-auto max-w-[300px] object-contain" />
       </div>
       <h1 className="text-3xl font-bold text-foreground text-center mb-2">{t('app.title')}</h1>
-      <p className="text-muted-foreground text-center mb-8">Create a new account</p>
+      <p className="text-muted-foreground text-center mb-8">{t('auth.createSubtitle')}</p>
       <form onSubmit={handleCreateUser} className="w-full max-w-sm space-y-4">
         <div>
           <label className="text-sm font-medium text-foreground block mb-2">{t('users.profileName')}</label>
@@ -54,6 +76,35 @@ const UsersPage = () => {
             placeholder="Name"
             className="w-full px-4 py-3 rounded-xl bg-secondary text-foreground"
             autoFocus
+          />
+        </div>
+        <div>
+          <label className="text-sm font-medium text-foreground block mb-2">{t('auth.username')}</label>
+          <input
+            value={addForm.username}
+            onChange={(e) => setAddForm((f) => ({ ...f, username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '') }))}
+            placeholder={t('auth.usernamePlaceholder')}
+            className="w-full px-4 py-3 rounded-xl bg-secondary text-foreground"
+          />
+        </div>
+        <div>
+          <label className="text-sm font-medium text-foreground block mb-2">{t('auth.password')}</label>
+          <input
+            type="password"
+            value={addForm.password}
+            onChange={(e) => setAddForm((f) => ({ ...f, password: e.target.value }))}
+            placeholder={t('auth.passwordPlaceholder')}
+            className="w-full px-4 py-3 rounded-xl bg-secondary text-foreground"
+          />
+        </div>
+        <div>
+          <label className="text-sm font-medium text-foreground block mb-2">{t('auth.confirmPassword')}</label>
+          <input
+            type="password"
+            value={addForm.confirmPassword}
+            onChange={(e) => setAddForm((f) => ({ ...f, confirmPassword: e.target.value }))}
+            placeholder={t('auth.confirmPassword')}
+            className="w-full px-4 py-3 rounded-xl bg-secondary text-foreground"
           />
         </div>
         <div>
@@ -73,27 +124,15 @@ const UsersPage = () => {
             ))}
           </div>
         </div>
-        <div>
-          <label className="text-sm font-medium text-foreground block mb-2">{t('users.optionalPin')}</label>
-          <input
-            type="password"
-            inputMode="numeric"
-            maxLength={4}
-            value={addForm.pin}
-            onChange={(e) => setAddForm((f) => ({ ...f, pin: e.target.value.replace(/\D/g, '') }))}
-            placeholder={t('users.pinPlaceholder')}
-            className="w-full px-4 py-3 rounded-xl bg-secondary text-foreground"
-          />
-        </div>
         {error && <p className="text-destructive text-sm">{error}</p>}
         <button type="submit" className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold">
           {t('users.createProfile')}
         </button>
       </form>
       <p className="text-center text-sm text-muted-foreground mt-6">
-        Already have an account?{' '}
+        {t('auth.haveAccount')}{' '}
         <Link to="/login" className="text-primary hover:underline font-medium">
-          Sign in
+          {t('users.signIn')}
         </Link>
       </p>
     </div>

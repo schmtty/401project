@@ -8,45 +8,61 @@ import { AppLogo } from '@/components/AppLogo';
 const LoginPage = () => {
   useDocumentTitle('Sign In');
   const navigate = useNavigate();
-  const { users, loading, selectUser } = useUser();
+  const { loading, login, setPassword } = useUser();
   const { t } = useLanguage();
-  const [name, setName] = useState('');
-  const [pin, setPin] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPasswordInput] = useState('');
   const [error, setError] = useState('');
+  const [showReset, setShowReset] = useState(false);
+  const [resetFor, setResetFor] = useState<{ id: string; username: string } | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [resetError, setResetError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (!name.trim()) {
-      setError('Please enter your name');
+    if (!username.trim() || !password) {
+      setError(t('auth.enterCredentials'));
       return;
     }
 
-    const user = users.find(
-      (u) => u.name.toLowerCase() === name.trim().toLowerCase()
-    );
-
+    const user = await login(username.trim(), password);
     if (!user) {
-      setError('No profile found with that name');
+      setError(t('auth.invalidCredentials'));
       return;
     }
 
-    if (user.pin) {
-      if (!pin) {
-        setError('PIN is required for this profile');
-        return;
-      }
-      const ok = await selectUser(user, pin);
-      if (!ok) {
-        setError('Invalid PIN');
-        return;
-      }
-    } else {
-      await selectUser(user);
+    if (user.mustResetPassword) {
+      setShowReset(true);
+      setResetFor({ id: user.id, username: user.username });
+      setResetError('');
+      return;
     }
 
     navigate('/');
+  };
+
+  const handleResetSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetError('');
+    if (newPassword.length < 8) {
+      setResetError(t('auth.passwordMin'));
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setResetError(t('auth.passwordMismatch'));
+      return;
+    }
+    if (!resetFor) return;
+    try {
+      await setPassword(resetFor.id, password, newPassword);
+      setShowReset(false);
+      navigate('/');
+    } catch (err) {
+      setResetError((err as Error).message || t('auth.resetFailed'));
+    }
   };
 
   if (loading) {
@@ -67,19 +83,19 @@ const LoginPage = () => {
           {t('app.title')}
         </h1>
         <p className="text-muted-foreground text-center mb-8">
-          Sign in to your profile
+          {t('auth.signInSubtitle')}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="text-sm font-medium text-foreground block mb-2">
-              Name
+              {t('auth.username')}
             </label>
             <input
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter your profile name"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder={t('auth.usernamePlaceholder')}
               className="w-full px-4 py-3 rounded-xl bg-secondary text-foreground"
               autoFocus
             />
@@ -87,15 +103,13 @@ const LoginPage = () => {
 
           <div>
             <label className="text-sm font-medium text-foreground block mb-2">
-              PIN
+              {t('auth.password')}
             </label>
             <input
               type="password"
-              inputMode="numeric"
-              maxLength={4}
-              value={pin}
-              onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
-              placeholder="4-digit PIN (if set)"
+              value={password}
+              onChange={(e) => setPasswordInput(e.target.value)}
+              placeholder={t('auth.passwordPlaceholder')}
               className="w-full px-4 py-3 rounded-xl bg-secondary text-foreground"
             />
           </div>
@@ -106,16 +120,49 @@ const LoginPage = () => {
             type="submit"
             className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold"
           >
-            Sign In
+            {t('users.signIn')}
           </button>
         </form>
 
         <p className="text-center text-sm text-muted-foreground mt-6">
-          Don't have a profile?{' '}
+          {t('auth.noAccount')}{' '}
           <Link to="/users" className="text-primary hover:underline font-medium">
-            Create one
+            {t('users.createProfile')}
           </Link>
         </p>
+
+        {showReset && (
+          <form onSubmit={handleResetSubmit} className="mt-8 space-y-4 border-t border-border pt-6">
+            <h2 className="text-lg font-semibold text-foreground">{t('auth.resetRequired')}</h2>
+            <p className="text-sm text-muted-foreground">
+              {t('auth.resetRequiredDesc')} {resetFor?.username}
+            </p>
+            <div>
+              <label className="text-sm font-medium text-foreground block mb-2">{t('auth.newPassword')}</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder={t('auth.newPassword')}
+                className="w-full px-4 py-3 rounded-xl bg-secondary text-foreground"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground block mb-2">{t('auth.confirmPassword')}</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder={t('auth.confirmPassword')}
+                className="w-full px-4 py-3 rounded-xl bg-secondary text-foreground"
+              />
+            </div>
+            {resetError && <p className="text-destructive text-sm">{resetError}</p>}
+            <button type="submit" className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold">
+              {t('auth.setPassword')}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );

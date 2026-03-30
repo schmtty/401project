@@ -9,8 +9,11 @@ User profiles (Netflix-style). Max 5 per app.
 | Field | Type | Constraints | Description |
 |-------|------|-------------|-------------|
 | id | VARCHAR(50) | PRIMARY KEY | Unique identifier |
+| username | VARCHAR(50) | NOT NULL, UNIQUE | Login username (lowercase/normalized) |
 | name | VARCHAR(255) | NOT NULL | Profile display name |
-| pin | VARCHAR(10) | NULL | Optional PIN for access restriction |
+| pin | VARCHAR(10) | NULL | Legacy PIN (migration bridge only; cleared after password set) |
+| password_hash | TEXT | NULL | Hashed password (`scrypt` format) |
+| must_reset_password | BOOLEAN | NOT NULL, DEFAULT FALSE | Forces password reset on login for migrated accounts |
 | avatar | VARCHAR(10) | NOT NULL, DEFAULT '👨' | Emoji avatar |
 | created_at | TIMESTAMPTZ | DEFAULT NOW() | Creation time |
 

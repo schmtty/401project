@@ -4,8 +4,11 @@
 -- Users: profiles (max 5 per app, Netflix-style)
 CREATE TABLE users (
   id VARCHAR(50) PRIMARY KEY,
+  username VARCHAR(50) NOT NULL UNIQUE,
   name VARCHAR(255) NOT NULL,
   pin VARCHAR(10) DEFAULT NULL,
+  password_hash TEXT DEFAULT NULL,
+  must_reset_password BOOLEAN NOT NULL DEFAULT FALSE,
   avatar VARCHAR(10) NOT NULL DEFAULT '👨',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );

@@ -31,7 +31,10 @@ export const api = {
     create: (body: object) => request(`/api/users`, { method: 'POST', body: JSON.stringify(body) }),
     update: (id: string, body: object) => request(`/api/users/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
     delete: (id: string) => request(`/api/users/${id}`, { method: 'DELETE' }),
-    verifyPin: (id: string, pin: string) => request(`/api/users/${id}/verify-pin`, { method: 'POST', body: JSON.stringify({ pin }) }),
+    login: (username: string, password: string) =>
+      request(`/api/users/login`, { method: 'POST', body: JSON.stringify({ username, password }) }),
+    setPassword: (id: string, currentPassword: string, newPassword: string) =>
+      request(`/api/users/${id}/set-password`, { method: 'POST', body: JSON.stringify({ currentPassword, newPassword }) }),
   },
   userSettings: {
     get: (userId: string) => request(`/api/user-settings/${userId}`),
