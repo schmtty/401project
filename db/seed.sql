@@ -1,9 +1,12 @@
 -- Keeper - Seed Data
--- Users first (required for FK), then settings, then connections/events/goals
+-- Reseed-safe: clear existing app data, then insert deterministic rows.
+
+TRUNCATE TABLE user_settings, calendar_events, connections, goals, users RESTART IDENTITY CASCADE;
 
 -- Users (default profile)
-INSERT INTO users (id, name, pin, avatar) VALUES
-('u1', 'Default User', NULL, '👨');
+-- Dev credentials: username `default_user`, password `keeper123`
+INSERT INTO users (id, username, name, pin, password_hash, must_reset_password, avatar) VALUES
+('u1', 'default_user', 'Default User', NULL, 'scrypt$16384$8$1$afc5ab0471b03708469ce2271726c4ca$3c3cbf9d5b558466a9553beee14dae16ceed64547cb868ee24c30e145ae96dd39de9fe289d98f9d3e27ecbcf404d60c830024fadda1b1829be7b7fa4877b8f2d', FALSE, '👨');
 
 -- User settings for default user
 INSERT INTO user_settings (id, user_id, theme, language) VALUES
@@ -11,26 +14,40 @@ INSERT INTO user_settings (id, user_id, theme, language) VALUES
 
 -- Connections (belong to u1)
 INSERT INTO connections (id, user_id, name, age, phone, location, notes, gender, relationship, liked, created_at, milestones) VALUES
-('1', 'u1', 'John Cena', 24, '555-0101', 'Provo Library', 'Likes to wrestle', 'male', 'friend', false, '2025-12-01', '{"dates":3,"heldHands":true,"kissed":false,"metParents":false,"contactStreak":7}'),
-('2', 'u1', 'Kristy Jensen', 22, '555-0102', 'The Coffee Pod Provo', 'DATE PLANNED THIS FRIDAY DON''T BE LATE', 'female', 'connection', true, '2025-11-15', '{"dates":5,"heldHands":true,"kissed":true,"metParents":false,"contactStreak":14}'),
-('3', 'u1', 'Don Pedro', 25, '555-0103', 'Vasa Fitness Orem', 'Need to setup some pickle ball with him soon...', 'male', 'friend', false, '2025-10-20', '{"dates":1,"heldHands":false,"kissed":false,"metParents":false,"contactStreak":2}'),
-('4', 'u1', 'Brinleigh Jackson', 23, '555-0104', 'UVU Art Building', 'SHE WAS CUTE GOTTA MAKE IT HAPPEN', 'female', 'connection', true, '2026-01-10', '{"dates":2,"heldHands":false,"kissed":false,"metParents":false,"contactStreak":5}'),
-('5', 'u1', 'Jake Jake', 26, '555-0105', 'Westview Park Orem', 'My absolute dog', 'male', 'friend', false, '2026-01-25', '{"dates":0,"heldHands":false,"kissed":false,"metParents":false,"contactStreak":1}');
+('1', 'u1', 'David Lopez', 24, '801-555-0101', 'Provo, UT', 'Met at BYU intramurals.', 'male', 'friend', false, (CURRENT_DATE - INTERVAL '120 days')::date, '{"dates":1,"heldHands":false,"kissed":false,"metParents":false,"contactStreak":3}'),
+('2', 'u1', 'Emma Jensen', 23, '801-555-0102', 'Orem, UT', 'Great conversations and very thoughtful.', 'female', 'connection', true, (CURRENT_DATE - INTERVAL '150 days')::date, '{"dates":6,"heldHands":true,"kissed":true,"metParents":false,"contactStreak":10}'),
+('3', 'u1', 'Noah Martinez', 25, '801-555-0103', 'Lehi, UT', 'Gym buddy from VASA in Orem.', 'male', 'friend', false, (CURRENT_DATE - INTERVAL '95 days')::date, '{"dates":0,"heldHands":false,"kissed":false,"metParents":false,"contactStreak":4}'),
+('4', 'u1', 'Sophia Clark', 22, '801-555-0104', 'Pleasant Grove, UT', 'Met at UVU student event.', 'female', 'connection', true, (CURRENT_DATE - INTERVAL '70 days')::date, '{"dates":3,"heldHands":true,"kissed":false,"metParents":false,"contactStreak":6}'),
+('5', 'u1', 'Ethan Kim', 26, '801-555-0105', 'American Fork, UT', 'Works nearby and likes hiking.', 'male', 'friend', false, (CURRENT_DATE - INTERVAL '60 days')::date, '{"dates":0,"heldHands":false,"kissed":false,"metParents":false,"contactStreak":2}'),
+('6', 'u1', 'Olivia Reed', 24, '801-555-0106', 'Spanish Fork, UT', 'Met through a mutual friend in Provo.', 'female', 'connection', true, (CURRENT_DATE - INTERVAL '45 days')::date, '{"dates":2,"heldHands":false,"kissed":false,"metParents":false,"contactStreak":5}');
 
 -- Calendar events (belong to u1)
 INSERT INTO calendar_events (id, user_id, title, date, time, location, notes, type, connection_id, color, status, reported_at, report_notes, report_milestones) VALUES
-('1', 'u1', 'Breakfast with Brooke', '2026-02-11', '10:00', 'BYU Cougareat, Provo, UT', '', 'date', '2', '#3b82f6', 'planned', NULL, NULL, NULL),
-('2', 'u1', 'Study Spanish', '2026-02-11', '11:00', 'Provo City Library, Provo, UT', '', 'other', NULL, '#ef4444', 'planned', NULL, NULL, NULL),
-('3', 'u1', 'Lunch with David', '2026-02-11', '12:00', 'BYU Wilkinson Center, Provo, UT', '', 'hangout', '3', '#22c55e', 'planned', NULL, NULL, NULL),
-('4', 'u1', 'Group Blind Date', '2026-02-11', '17:00', 'Center Street, Provo, UT', '', 'date', NULL, '#eab308', 'planned', NULL, NULL, NULL),
-('5', 'u1', 'Pickle Ball with the boys', '2026-02-14', '15:00', 'Provo Recreation Center, Provo, UT', '', 'hangout', '3', '#8b5cf6', 'planned', NULL, NULL, NULL),
-('6', 'u1', 'Date with Katelyn', '2026-02-14', '18:00', 'Brick Oven Pizza, Provo, UT', '', 'date', '2', '#ec4899', 'planned', NULL, NULL, NULL),
-('7', 'u1', 'Dinner date', '2026-02-15', '19:00', 'Happy Sumo Sushi, Provo, UT', '', 'date', '4', '#06b6d4', 'planned', NULL, NULL, NULL);
+('1',  'u1', 'Brunch with Emma',                    (CURRENT_DATE - INTERVAL '1 day')::date,  '10:00', 'The Coffee Pod, Provo, UT',                  'Recap last week and plan next date.',                 'date',    '2', '#ec4899', 'planned', NULL, NULL, NULL),
+('2',  'u1', 'Lunch with David',                    CURRENT_DATE,                                '12:15', 'Station 22 Cafe, Provo, UT',                 'Catch up on work and weekend plans.',                 'hangout', '1', '#3b82f6', 'planned', NULL, NULL, NULL),
+('3',  'u1', 'Gym session with Noah',               (CURRENT_DATE + INTERVAL '1 day')::date,    '18:00', 'VASA Fitness, Orem, UT',                     'Leg day and post-workout smoothie.',                  'hangout', '3', '#22c55e', 'planned', NULL, NULL, NULL),
+('4',  'u1', 'Ice cream walk with Sophia',          (CURRENT_DATE + INTERVAL '2 days')::date,   '19:00', 'Jakes Brookside, Springville, UT',           'Walk around downtown after dessert.',                 'date',    '4', '#f97316', 'planned', NULL, NULL, NULL),
+('5',  'u1', 'Call Ethan about hiking route',       (CURRENT_DATE + INTERVAL '2 days')::date,   '20:30', 'American Fork, UT',                          'Finalize trail and carpool details.',                 'call',    '5', '#8b5cf6', 'planned', NULL, NULL, NULL),
+('6',  'u1', 'Dinner with Olivia',                  (CURRENT_DATE + INTERVAL '3 days')::date,   '19:30', 'Communal, Provo, UT',                        'Try the new seasonal menu.',                          'date',    '6', '#06b6d4', 'planned', NULL, NULL, NULL),
+('7',  'u1', 'Text check-in with Emma',             (CURRENT_DATE + INTERVAL '4 days')::date,   '09:15', 'Orem, UT',                                   'Quick morning check-in before work.',                 'text',    '2', '#ef4444', 'planned', NULL, NULL, NULL),
+('8',  'u1', 'Pickleball with David',               (CURRENT_DATE + INTERVAL '5 days')::date,   '17:45', 'Provo Recreation Center, Provo, UT',         'Play doubles with two friends.',                      'hangout', '1', '#10b981', 'planned', NULL, NULL, NULL),
+('9',  'u1', 'Coffee with Sophia',                  (CURRENT_DATE + INTERVAL '6 days')::date,   '08:30', 'Peace on Earth Coffee, Provo, UT',           'Morning coffee before classes.',                      'date',    '4', '#eab308', 'planned', NULL, NULL, NULL),
+('10', 'u1', 'Lunch with Ethan',                    (CURRENT_DATE + INTERVAL '7 days')::date,   '12:00', 'Cubby’s, Orem, UT',                          'Discuss internship updates.',                         'hangout', '5', '#14b8a6', 'planned', NULL, NULL, NULL),
+('11', 'u1', 'Sunset walk with Olivia',             (CURRENT_DATE + INTERVAL '8 days')::date,   '19:15', 'Utah Lake Shore Trail, Provo, UT',           'Light walk and talk.',                                'date',    '6', '#6366f1', 'planned', NULL, NULL, NULL),
+('12', 'u1', 'Board game night with Noah',          (CURRENT_DATE + INTERVAL '9 days')::date,   '20:00', 'The Soap Factory, Provo, UT',                'Friendly game night.',                                'hangout', '3', '#a855f7', 'planned', NULL, NULL, NULL),
+('13', 'u1', 'Brunch with Emma',                    (CURRENT_DATE + INTERVAL '10 days')::date,  '11:00', 'Black Sheep Cafe, Provo, UT',                'Catch up over brunch downtown.',                     'date',    '2', '#fb7185', 'planned', NULL, NULL, NULL),
+('14', 'u1', 'Text Noah to confirm gym time',       (CURRENT_DATE + INTERVAL '12 days')::date,  '16:10', 'Lehi, UT',                                   'Confirm next week training block.',                   'text',    '3', '#0ea5e9', 'planned', NULL, NULL, NULL),
+('15', 'u1', 'Date night with Olivia',              (CURRENT_DATE + INTERVAL '14 days')::date,  '19:45', 'Sol Agave, American Fork, UT',               'Dinner reservation for two.',                         'date',    '6', '#f43f5e', 'planned', NULL, NULL, NULL),
+('16', 'u1', 'Study block at library',              CURRENT_DATE,                                '15:00', 'Orem Public Library, Orem, UT',              'Two focused hours for school.',                       'other',   NULL, '#94a3b8', 'planned', NULL, NULL, NULL),
+('17', 'u1', 'Call mom',                            (CURRENT_DATE + INTERVAL '1 day')::date,    '21:00', 'Provo, UT',                                  'Weekly family check-in.',                             'call',    NULL, '#64748b', 'planned', NULL, NULL, NULL),
+('18', 'u1', 'Ward social mixer',                   (CURRENT_DATE + INTERVAL '4 days')::date,   '19:00', 'Provo City Center, Provo, UT',               'Meet new people and reconnect with friends.',         'other',   NULL, '#84cc16', 'planned', NULL, NULL, NULL),
+('19', 'u1', 'Career fair prep',                    (CURRENT_DATE + INTERVAL '7 days')::date,   '18:30', 'UVU Library, Orem, UT',                      'Resume review and mock interview prep.',              'other',   NULL, '#f59e0b', 'planned', NULL, NULL, NULL),
+('20', 'u1', 'Temple square road-trip planning',    (CURRENT_DATE + INTERVAL '11 days')::date,  '20:15', 'Pleasant Grove, UT',                         'Coordinate rides and timing with group chat.',        'other',   NULL, '#22d3ee', 'planned', NULL, NULL, NULL);
 
 -- Goals (belong to u1)
 INSERT INTO goals (id, user_id, title, goal_type, measure, actions, target_date, notes, category, target, current, completed, history) VALUES
-('1', 'u1', 'Go on 10 dates', 'measurable', 'Number of dates', 'Ask someone out each week', '2026-06-01', '', 'love', 10, 6, false, '[{"date":"2026-01-29","value":2},{"date":"2026-02-01","value":3},{"date":"2026-02-05","value":4},{"date":"2026-02-08","value":5},{"date":"2026-02-11","value":6}]'),
-('2', 'u1', 'Hit the gym 5x/week', 'measurable', 'Gym visits per week', 'Morning workouts', '2026-04-01', '', 'fitness', 20, 12, false, '[{"date":"2026-01-28","value":4},{"date":"2026-02-02","value":6},{"date":"2026-02-06","value":8},{"date":"2026-02-09","value":10},{"date":"2026-02-11","value":12}]'),
-('3', 'u1', 'Get 3.5 GPA', 'measurable', 'GPA score', 'Study 2 hours daily', '2026-05-15', '', 'school', 100, 78, false, '[]'),
-('4', 'u1', 'Land internship', 'completion', '', 'Apply to 5 companies per week', '2026-03-01', '', 'work', 0, 0, false, '[]'),
-('5', 'u1', 'Expand social circle', 'measurable', 'New people met', 'Attend 2 social events/week', '2026-06-01', '', 'social', 30, 12, false, '[]');
+('1', 'u1', 'Go on 12 intentional dates', 'measurable', 'Dates completed', 'Plan one quality date per week', (CURRENT_DATE + INTERVAL '120 days')::date, '', 'love', 12, 5, false, '[{"date":"2026-03-01","value":2},{"date":"2026-03-10","value":3},{"date":"2026-03-20","value":4},{"date":"2026-03-28","value":5}]'),
+('2', 'u1', 'Gym consistency', 'measurable', 'Workouts completed', 'Lift 4x/week and track cardio', (CURRENT_DATE + INTERVAL '90 days')::date, '', 'fitness', 40, 14, false, '[{"date":"2026-03-04","value":6},{"date":"2026-03-12","value":9},{"date":"2026-03-20","value":12},{"date":"2026-03-28","value":14}]'),
+('3', 'u1', 'Finish semester strong', 'measurable', 'Study sessions', 'Complete at least 5 focused sessions per week', (CURRENT_DATE + INTERVAL '75 days')::date, '', 'school', 50, 18, false, '[{"date":"2026-03-08","value":8},{"date":"2026-03-16","value":12},{"date":"2026-03-24","value":16},{"date":"2026-03-29","value":18}]'),
+('4', 'u1', 'Secure summer internship', 'completion', '', 'Apply weekly and follow up within 48 hours', (CURRENT_DATE + INTERVAL '60 days')::date, '', 'work', 0, 0, false, '[]'),
+('5', 'u1', 'Grow friend network', 'measurable', 'New meaningful connections', 'Attend two community/social events each month', (CURRENT_DATE + INTERVAL '120 days')::date, '', 'social', 20, 7, false, '[{"date":"2026-03-05","value":3},{"date":"2026-03-15","value":5},{"date":"2026-03-29","value":7}]');

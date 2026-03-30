@@ -8,7 +8,7 @@
 
 **Calendar** ties events to optional connections, supports map coordinates, and includes **outcome reporting** for past events: you mark **Happened** or **Fell Through**, add notes, and—when the event is linked to someone **you have liked**—you can check off **report milestones** (e.g. held hands). If the linked person is **not** liked, the report flow shows a **Like** action first; after you like them, milestone checkboxes appear. Reported milestones merge into the connection’s stored milestones. The home row and calendar highlight when **past events still need a report**.
 
-**Profiles** are Netflix-style (up to five) with optional PINs. **Settings** cover theme, language (English, Spanish, Chinese Simplified), and profile name/avatar. Data persists in **PostgreSQL** via the Express API.
+**Profiles** support up to five users with **unique usernames** and **password-based sign-in**. Passwords are stored as hashes, and legacy PIN accounts are forced through a password reset flow. **Settings** cover theme, language (English, Spanish, Chinese Simplified), and profile name/avatar. Data persists in **PostgreSQL** via the Express API.
 
 ---
 
@@ -19,7 +19,7 @@
 | **Frontend** | React 18, TypeScript, Vite, Tailwind CSS, shadcn/ui, React Router |
 | **Backend** | Node.js, Express |
 | **Database** | PostgreSQL 14+ (via `pg` / node-postgres, no ORM) |
-| **Authentication** | Optional PIN per user profile (client-side verification) |
+| **Authentication** | Username + password (hashed on backend); forced password reset for migrated legacy accounts |
 | **External services** | Optional **Google Gemini** for RizzBot when `GOOGLE_AI_API_KEY` is set (otherwise rule-based fallback) |
 
 ---
@@ -129,6 +129,7 @@ If you already have an `ab2` database from an older clone, apply incremental mig
 
 ```bash
 psql -U postgres -d ab2 -f db/migrations/001_calendar_event_reporting.sql
+psql -U postgres -d ab2 -f db/migrations/002_username_password_auth.sql
 ```
 
 ### 4. Configure environment variables
@@ -174,9 +175,10 @@ From the **repository root**, you can alternatively use `npm run install:all` on
 
 ### First run
 
-1. You will see the **profile selection** page (“Select Profile”).
-2. Select **Default User** (or create a new profile).
-3. Explore **Connections**, **Calendar**, **Map**, **Goals**, **RizzBot**, and **Settings** from the home shell / navigation.
+1. You will land on the **Login** page by default.
+2. Use the seeded dev account credentials: username `default_user`, password `keeper123`.
+3. If your account was migrated from a legacy PIN setup, you will be prompted to set a new password after login.
+4. Explore **Connections**, **Calendar**, **Map**, **Goals**, **RizzBot**, and **Settings** from the home shell / navigation.
 
 ---
 
@@ -212,7 +214,9 @@ You can also open a **past calendar event**, report **Happened** or **Fell Throu
 |--------|----------|-------------|
 | GET | `/api/health` | API health check |
 | GET | `/api/users` | List user profiles |
-| POST | `/api/users` | Create user (max 5) |
+| POST | `/api/users` | Create user (max 5, unique username, hashed password) |
+| POST | `/api/users/login` | Login with username/password |
+| POST | `/api/users/:id/set-password` | Set/reset password (required for migrated users) |
 | PUT | `/api/users/:id` | Update user |
 | DELETE | `/api/users/:id` | Delete user |
 | GET | `/api/user-settings/:userId` | Get theme & language |
@@ -294,7 +298,7 @@ The app logo and favicon use the same image: **`frontend/public/keeper-logo.png`
 
 ## Features (current)
 
-- **Profiles** (max 5): selection screen, optional PIN
+- **Profiles** (max 5): unique username + password login, hashed credentials, forced reset for migrated legacy users
 - **Connections**: add/edit, **liked** toggle, notes, milestones; detail milestones UI only when **liked**; cards show flame streak only when **liked** and streak threshold met
 - **Calendar**: day-focused lists, optional global **past** / **future** sections, indicators for **unreported past events**, event modal (create/edit/report), **Happened** / **Fell Through** with notes; **report milestones** only for **liked** linked connections (otherwise **Like** first)
 - **Map**: events with optional connection filter and geography
