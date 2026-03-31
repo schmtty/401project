@@ -22,6 +22,7 @@ import MapPage from "./pages/MapPage";
 import GoalsPage from "./pages/GoalsPage";
 import RizzBotPage from "./pages/RizzBotPage";
 import SettingsPage from "./pages/SettingsPage";
+import OkrPage from "./pages/OkrPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -53,6 +54,7 @@ function AppContent() {
         <Route path="/goals" element={<AuthGuard><GoalsPage /></AuthGuard>} />
         <Route path="/rizzbot" element={<AuthGuard><RizzBotPage /></AuthGuard>} />
         <Route path="/settings" element={<AuthGuard><SettingsPage /></AuthGuard>} />
+        <Route path="/okr" element={<AuthGuard><OkrPage /></AuthGuard>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       {currentUser && !isUsersPage && <BottomNav />}

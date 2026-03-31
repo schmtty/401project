@@ -10,6 +10,7 @@ import goalsRouter from './routes/goals.js';
 import usersRouter from './routes/users.js';
 import userSettingsRouter from './routes/userSettings.js';
 import rizzbotRouter from './routes/rizzbot.js';
+import okrRouter from './routes/okr.js';
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use('/api/user-settings', userSettingsRouter);
 app.use('/api/connections', connectionsRouter);
 app.use('/api/events', eventsRouter);
 app.use('/api/goals', goalsRouter);
+app.use('/api/okr', okrRouter);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Keeper API running' });
