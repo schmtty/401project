@@ -1,6 +1,21 @@
 /**
  * Calendar Events API - CRUD for events (user-scoped)
- * Requires X-User-Id header
+ *
+ * All routes require the X-User-Id header (enforced by requireUserId middleware).
+ *
+ * Endpoints:
+ *   GET    /api/events             - List all events for the current user, ordered by date/time
+ *   POST   /api/events             - Create a new event (status defaults to 'planned')
+ *   PUT    /api/events/:id         - Update event fields and/or report an outcome
+ *   DELETE /api/events/:id         - Delete an event
+ *
+ * Event status lifecycle:
+ *   planned -> happened    (outcome was reported; enables milestone reporting)
+ *   planned -> fell_through (outcome was reported; milestones are cleared)
+ *   happened/fell_through -> planned (resets all reporting fields)
+ *
+ * Reporting milestones shape (stored as JSONB, only present when status === 'happened'):
+ *   { heldHands: boolean, kissed: boolean, metParents: boolean }
  */
 import express from 'express';
 import pool from '../db.js';
@@ -9,8 +24,15 @@ import { requireUserId } from '../middleware/userId.js';
 const router = express.Router();
 router.use(requireUserId);
 
+/** Accepted values for the event status field. */
 const VALID_STATUSES = new Set(['planned', 'happened', 'fell_through']);
 
+/**
+ * Return today's date as a YYYY-MM-DD string in the server's local timezone.
+ * Used to compare event dates without timezone offset confusion.
+ * @param {Date} [d=new Date()] - Reference date, defaults to now.
+ * @returns {string} YYYY-MM-DD
+ */
 function localDateStr(d = new Date()) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -18,6 +40,12 @@ function localDateStr(d = new Date()) {
   return `${y}-${m}-${day}`;
 }
 
+/**
+ * Convert a "HH:MM" time string to minutes since midnight for numeric comparison.
+ * Defaults to noon (720) when the input is missing or unparseable.
+ * @param {string} timeStr - Time in "HH:MM" format.
+ * @returns {number} Minutes since midnight.
+ */
 function eventMinutesFromMidnight(timeStr) {
   const [h = 12, m = 0] = String(timeStr || '12:00').split(':').map((x) => parseInt(x, 10));
   return (Number.isFinite(h) ? h : 0) * 60 + (Number.isFinite(m) ? m : 0);
@@ -31,13 +59,25 @@ function isEventInPast(dateStr, timeStr, now = new Date()) {
   return eventMinutesFromMidnight(timeStr) <= now.getHours() * 60 + now.getMinutes();
 }
 
-// Format date as YYYY-MM-DD for frontend
+/**
+ * Format a date value as a YYYY-MM-DD string for consistent frontend serialization.
+ * @param {Date|string|null} val - Raw date value from the database.
+ * @returns {string} YYYY-MM-DD string, or empty string if falsy.
+ */
 function formatDate(val) {
   if (!val) return '';
   if (typeof val === 'string') return val.slice(0, 10);
   return val.toISOString().slice(0, 10);
 }
 
+/**
+ * Normalize the report_milestones payload sent from the client.
+ * Only returns a milestones object when the event actually happened;
+ * coerces each flag to a boolean to guard against loose frontend values.
+ * @param {string} status - Resolved event status ('happened', 'fell_through', etc.).
+ * @param {object|null} raw - Raw milestones object from the request body.
+ * @returns {{ heldHands: boolean, kissed: boolean, metParents: boolean }|null}
+ */
 function normalizeReportMilestones(status, raw) {
   if (status !== 'happened' || !raw || typeof raw !== 'object') return null;
   return {
@@ -47,7 +87,12 @@ function normalizeReportMilestones(status, raw) {
   };
 }
 
-// Transform DB row to frontend format
+/**
+ * Transform a raw database row into the camelCase shape expected by the frontend.
+ * lat/lng are only included when non-null to avoid sending null coordinates to the map.
+ * @param {object} row - Raw row from the calendar_events table.
+ * @returns {object} Frontend-shaped event object.
+ */
 function toEvent(row) {
   const e = {
     id: row.id,

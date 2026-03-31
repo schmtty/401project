@@ -1,6 +1,17 @@
 /**
  * Connections API - CRUD for connections (user-scoped)
- * Requires X-User-Id header
+ *
+ * All routes require the X-User-Id header (enforced by requireUserId middleware).
+ * Connections are private to the authenticated user; queries always filter by user_id.
+ *
+ * Endpoints:
+ *   GET    /api/connections        - List all connections for the current user
+ *   POST   /api/connections        - Create a new connection
+ *   PUT    /api/connections/:id    - Update an existing connection (milestones use COALESCE)
+ *   DELETE /api/connections/:id    - Delete a connection
+ *
+ * Milestones shape (stored as JSONB):
+ *   { dates: number, heldHands: boolean, kissed: boolean, metParents: boolean, contactStreak: number }
  */
 import express from 'express';
 import pool from '../db.js';
@@ -9,14 +20,24 @@ import { requireUserId } from '../middleware/userId.js';
 const router = express.Router();
 router.use(requireUserId);
 
-// Format date as YYYY-MM-DD
+/**
+ * Format a date value as a YYYY-MM-DD string for consistent frontend serialization.
+ * Handles both JS Date objects and ISO strings already stored in the database.
+ * @param {Date|string|null} val - Raw date value from the database.
+ * @returns {string} YYYY-MM-DD string, or empty string if falsy.
+ */
 function formatDate(val) {
   if (!val) return '';
   if (typeof val === 'string') return val.slice(0, 10);
   return val.toISOString().slice(0, 10);
 }
 
-// Transform DB row to frontend format (snake_case -> camelCase)
+/**
+ * Transform a raw database row into the camelCase shape expected by the frontend.
+ * Applies a default milestones object when none is stored.
+ * @param {object} row - Raw row from the connections table.
+ * @returns {object} Frontend-shaped connection object.
+ */
 function toConnection(row) {
   return {
     id: row.id,
