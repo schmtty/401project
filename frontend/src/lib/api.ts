@@ -62,4 +62,13 @@ export const api = {
     update: (userId: string, id: string, body: object) => request(`/api/goals/${id}`, { method: 'PUT', body: JSON.stringify(body), userId }),
     delete: (userId: string, id: string) => request(`/api/goals/${id}`, { method: 'DELETE', userId }),
   },
+  okr: {
+    getAverageConnectionsPerUser: () =>
+      request<{
+        totalUsers: number;
+        totalConnections: number;
+        averageConnectionsPerUser: number;
+        calculatedAt: string;
+      }>(`/api/okr`),
+  },
 };
