@@ -1,6 +1,20 @@
 /**
  * Goals API - CRUD for goals (user-scoped)
- * Requires X-User-Id header
+ *
+ * All routes require the X-User-Id header (enforced by requireUserId middleware).
+ *
+ * Endpoints:
+ *   GET    /api/goals              - List all goals for the current user, ordered by target_date
+ *   POST   /api/goals              - Create a new goal
+ *   PUT    /api/goals/:id          - Update a goal (history uses COALESCE to preserve existing data)
+ *   DELETE /api/goals/:id          - Delete a goal
+ *
+ * goalType values: 'measurable' | 'completion'
+ * category values: 'love' | 'fitness' | 'school' | 'work' | 'social'
+ *
+ * History shape (stored as JSONB array):
+ *   [{ date: "YYYY-MM-DD", value: number }, ...]
+ *   Each entry records a progress snapshot; used to render progress charts on the frontend.
  */
 import express from 'express';
 import pool from '../db.js';
@@ -9,14 +23,23 @@ import { requireUserId } from '../middleware/userId.js';
 const router = express.Router();
 router.use(requireUserId);
 
-// Format date as YYYY-MM-DD
+/**
+ * Format a date value as a YYYY-MM-DD string for consistent frontend serialization.
+ * @param {Date|string|null} val - Raw date value from the database.
+ * @returns {string} YYYY-MM-DD string, or empty string if falsy.
+ */
 function formatDate(val) {
   if (!val) return '';
   if (typeof val === 'string') return val.slice(0, 10);
   return val.toISOString().slice(0, 10);
 }
 
-// Transform DB row to frontend format
+/**
+ * Transform a raw database row into the camelCase shape expected by the frontend.
+ * Always ensures history is an array (guards against raw JSONB being a plain object).
+ * @param {object} row - Raw row from the goals table.
+ * @returns {object} Frontend-shaped goal object.
+ */
 function toGoal(row) {
   const g = {
     id: row.id,

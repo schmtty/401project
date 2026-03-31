@@ -1,7 +1,26 @@
 /**
  * RizzBot API - LLM-powered texting feedback
- * Uses Google Gemini when GOOGLE_AI_API_KEY is set
- * Requires X-User-Id header
+ *
+ * Uses Google Gemini (gemini-2.0-flash-lite) when GOOGLE_AI_API_KEY is set in the environment.
+ * When the API key is absent the route returns 503 with { fallback: true } so the frontend
+ * can display a rule-based fallback instead of an error.
+ *
+ * Requires X-User-Id header (enforced by requireUserId middleware).
+ *
+ * Endpoint:
+ *   POST /api/rizzbot
+ *     Body: {
+ *       connection:   { name: string, ...milestones, relationship? }
+ *       objective:    string   - what the user is trying to accomplish with the message
+ *       userMessage?: string   - the draft text to critique (omit for starter suggestions)
+ *       context?:    {
+ *         connectionNotes?:  string
+ *         eventSummaries?:   { title, type, notes }[]
+ *         upcomingEvents?:   { title, date }[]
+ *         milestones?:       { dates, heldHands, kissed }
+ *         relationship?:     string
+ *       }
+ *     }
  */
 import express from 'express';
 import { GoogleGenAI } from '@google/genai';
@@ -12,6 +31,15 @@ router.use(requireUserId);
 
 const API_KEY = process.env.GOOGLE_AI_API_KEY;
 
+/**
+ * Build the system prompt sent to Gemini, injecting personalized context about
+ * the connection (notes, shared events, milestones) so the AI can give relevant advice.
+ * Context fields are each optional; missing ones are silently skipped.
+ * @param {object} connection - Connection object from the request (must have .name).
+ * @param {string} objective - What the user wants to achieve with their message.
+ * @param {object} ctx - Optional context: connectionNotes, eventSummaries, upcomingEvents, milestones, relationship.
+ * @returns {string} Fully assembled system prompt string.
+ */
 function buildSystemPrompt(connection, objective, ctx) {
   const name = connection?.name || 'them';
   const parts = [
@@ -52,6 +80,11 @@ function buildSystemPrompt(connection, objective, ctx) {
   return parts.join('\n');
 }
 
+/**
+ * POST /api/rizzbot
+ * Accept a connection, objective, optional draft message, and context; return AI coaching text.
+ * Returns 503 with { fallback: true } when GOOGLE_AI_API_KEY is not configured.
+ */
 router.post('/', async (req, res) => {
   try {
     const { connection, objective, userMessage, context } = req.body;

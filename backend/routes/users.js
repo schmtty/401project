@@ -1,22 +1,41 @@
 /**
  * Users API - auth and CRUD for user profiles
- * GET /api/users
- * POST /api/users
- * PUT /api/users/:id
- * DELETE /api/users/:id
+ *
+ * Endpoints:
+ *   GET    /api/users              - List all user profiles (max 5)
+ *   POST   /api/users              - Create a new user with hashed password
+ *   PUT    /api/users/:id          - Update name, avatar, or username
+ *   DELETE /api/users/:id          - Delete user and all associated data (cascade)
+ *   POST   /api/users/login        - Authenticate with username + password
+ *   POST   /api/users/:id/set-password - Change password (supports legacy PIN migration)
  */
 import express from 'express';
 import pool from '../db.js';
 import { hashPassword, verifyPassword } from '../auth/passwords.js';
 
 const router = express.Router();
+
+/** Allowed username format: 3–30 chars, lowercase letters, digits, underscores only. */
 const USERNAME_RE = /^[a-z0-9_]{3,30}$/;
+
+/** Minimum accepted password length (characters). */
 const MIN_PASSWORD_LENGTH = 8;
 
+/**
+ * Normalize a raw username input to lowercase with surrounding whitespace removed.
+ * @param {*} raw - Raw value from request body (may be undefined or non-string).
+ * @returns {string} Trimmed, lowercased username string.
+ */
 function normalizeUsername(raw) {
   return String(raw || '').trim().toLowerCase();
 }
 
+/**
+ * Strip sensitive database columns and return only the fields safe to send to the client.
+ * Omits password_hash and pin; converts must_reset_password to camelCase boolean.
+ * @param {object} row - Raw row from the users table.
+ * @returns {object} Public-safe user object.
+ */
 function userRowToPublic(row) {
   return {
     id: row.id,

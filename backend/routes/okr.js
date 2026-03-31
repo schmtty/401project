@@ -1,3 +1,18 @@
+/**
+ * OKR API - system-wide key result metrics
+ *
+ * Returns aggregate statistics across all users for the OKR dashboard.
+ * This endpoint is not user-scoped and requires no authentication header.
+ *
+ * Endpoint:
+ *   GET /api/okr
+ *     Response: {
+ *       totalUsers:                 number  - count of all registered user profiles
+ *       totalConnections:           number  - count of all connections across all users
+ *       averageConnectionsPerUser:  number  - totalConnections / totalUsers (0 when no users exist)
+ *       calculatedAt:               string  - ISO timestamp of when the metrics were computed
+ *     }
+ */
 import express from 'express';
 import pool from '../db.js';
 
