@@ -23,6 +23,7 @@ const BottomNav = () => {
       >
         <button
           onClick={openAddConnection}
+          aria-label="Add new connection"
           className="flex flex-col items-center gap-0.5 tap-target px-4 py-1 transition-ios text-muted-foreground hover:text-foreground active-scale"
         >
           <UserPlus size={24} strokeWidth={1.8} />
@@ -31,6 +32,8 @@ const BottomNav = () => {
 
         <button
           onClick={() => navigate('/')}
+          aria-label="Go to home"
+          aria-current={isHome ? 'page' : undefined}
           className={`flex flex-col items-center gap-0.5 tap-target px-4 py-1 transition-ios active-scale ${
             isHome ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
           }`}
@@ -41,6 +44,8 @@ const BottomNav = () => {
 
         <button
           onClick={() => navigate('/settings')}
+          aria-label="Go to settings"
+          aria-current={location.pathname === '/settings' ? 'page' : undefined}
           className={`flex flex-col items-center gap-0.5 tap-target px-4 py-1 transition-ios active-scale ${
             location.pathname === '/settings' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
           }`}

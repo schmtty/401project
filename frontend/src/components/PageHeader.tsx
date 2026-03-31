@@ -15,7 +15,7 @@ const PageHeader = ({ title, showBack = false, rightAction }: PageHeaderProps) =
       <div className="flex items-center justify-between px-5 h-14">
         <div className="flex items-center gap-3">
           {showBack && (
-            <button onClick={() => navigate(-1)} className="tap-target flex items-center justify-center active-scale">
+            <button onClick={() => navigate(-1)} aria-label="Go back" className="tap-target flex items-center justify-center active-scale">
               <ArrowLeft size={22} />
             </button>
           )}
